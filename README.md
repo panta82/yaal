@@ -1,5 +1,5 @@
-=================================
-YET ANOTHER ASYNC LIBRARY (YAAL)
+# YET ANOTHER ASYNC LIBRARY
+## (or YAAL <small><- clever, huh?</small>)
 =================================
 
 Yet another async library.
