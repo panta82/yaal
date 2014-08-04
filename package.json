@@ -1,0 +1,28 @@
+{
+  "name": "yaal",
+  "version": "0.0.1",
+  "description": "Yet another async library. Trying to pack all the options one might need into a single fn call",
+  "main": "index.js",
+  "scripts": {
+    "test": "./testall.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/panta82/yaal.git"
+  },
+  "keywords": [
+    "async",
+    "concurrent",
+    "asynchronous",
+    "parallel",
+    "multiple",
+    "callback",
+    "series"
+  ],
+  "author": "panta82",
+  "license": "Apache 2",
+  "bugs": {
+    "url": "https://github.com/panta82/yaal/issues"
+  },
+  "homepage": "https://github.com/panta82/yaal"
+}
