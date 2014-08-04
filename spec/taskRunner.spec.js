@@ -43,7 +43,7 @@ describe("Task runner", function () {
 		});
 	});
 
-	it("can runute all fns at the same time", function (done) {
+	it("can run all fns at the same time", function (done) {
 		var tr = new TaskRunner(Number.POSITIVE_INFINITY);
 
 		var startedAt = new Date(),
@@ -59,12 +59,16 @@ describe("Task runner", function () {
 
 		tr.on("ready", function () {
 			if (index < tasks.length) {
+				expect(tr.completed).toEqual(0);
+				expect(tr.tasks).toEqual(index);
 				tr.run(index, tasks[index]);
 				index++;
 			}
 		});
 		tr.on("done", function () {
 			resultCount++;
+			expect(tr.completed).toEqual(resultCount);
+			expect(tr.tasks).toEqual(tasks.length - resultCount);
 			if (resultCount >= tasks.length) {
 				testAndDone();
 			}
@@ -72,12 +76,12 @@ describe("Task runner", function () {
 
 		function testAndDone() {
 			var elapsed = new Date() - startedAt;
-			expect(elapsed).toBeLessThan(200);
+			expect(elapsed).toBeLessThan(120);
 			done();
 		}
 	});
 
-	it("can runute fns with precise parallelism control", function (done) {
+	it("can run the fns with precise parallelism control", function (done) {
 		var tr = new TaskRunner(2);
 
 		var startedAt = new Date(),
@@ -114,7 +118,7 @@ describe("Task runner", function () {
 		}
 	});
 
-	it("can runute one fn at a time", function (done) {
+	it("can run one fn at a time", function (done) {
 		var tr = new TaskRunner(1);
 
 		var startedAt = new Date(),
@@ -147,6 +151,46 @@ describe("Task runner", function () {
 			expect(elapsed).toBeLessThan(620);
 			done();
 		}
+	});
+
+	it("can emit an 'end' event", function (done) {
+		var tr = new TaskRunner(3, 2);
+
+		var startedAt = new Date(),
+			tasks = [
+				,
+				libTools.makeTimeoutFn(200),
+				libTools.makeTimeoutFn(300)
+			],
+			readyCount = 0,
+			resultCount = 0;
+
+		expect(tr.total).toEqual(2);
+		expect(tr.ended).toEqual(false);
+
+		tr.on("ready", function () {
+			if (readyCount === 0) {
+				expect(tr.tasks).toEqual(0);
+				tr.run("a", libTools.makeTimeoutFn(100));
+				expect(tr.tasks).toEqual(1);
+				tr.run("b", libTools.makeTimeoutFn(200));
+				expect(tr.tasks).toEqual(2);
+				tr.run("c", libTools.makeTimeoutFn(300));
+				expect(tr.tasks).toEqual(2);
+				expect(tr.completed).toEqual(0);
+			}
+		});
+		tr.on("done", function () {
+			expect(tr.total).toEqual(2);
+			expect(tr.ended).toEqual(false);
+		});
+		tr.on("end", function () {
+			expect(tr.tasks).toEqual(0);
+			expect(tr.completed).toEqual(2);
+			expect(tr.total).toEqual(2);
+			expect(tr.ended).toEqual(true);
+			done();
+		});
 	});
 
 	it("will refuse to add additional functions if at capacity", function (done) {
