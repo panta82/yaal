@@ -1,4 +1,5 @@
-var libTools = require("../lib/tools"),
+var libHelpers = require("./helpers"),
+	
 	TaskRunner = require("../lib/tasks/taskRunner");
 
 describe("Task runner", function () {
@@ -12,7 +13,7 @@ describe("Task runner", function () {
 		tr.on("ready", function () {
 			readyCount++;
 			if (readyCount === 1) {
-				tr.run("key", libTools.makeTimeoutFn(100, new Error("msg"), "b", 3, null, undefined));
+				tr.run("key", libHelpers.makeTimeoutFn(100, new Error("msg"), "b", 3, null, undefined));
 			}
 			else if (readyCount === 2) {
 				expect(new Date() - runTs < 50);
@@ -48,11 +49,11 @@ describe("Task runner", function () {
 
 		var startedAt = new Date(),
 			tasks = [
-				libTools.makeTimeoutFn(100),
-				libTools.makeTimeoutFn(100),
-				libTools.makeTimeoutFn(100),
-				libTools.makeTimeoutFn(100),
-				libTools.makeTimeoutFn(100)
+				libHelpers.makeTimeoutFn(100),
+				libHelpers.makeTimeoutFn(100),
+				libHelpers.makeTimeoutFn(100),
+				libHelpers.makeTimeoutFn(100),
+				libHelpers.makeTimeoutFn(100)
 			],
 			index = 0,
 			resultCount = 0;
@@ -86,11 +87,11 @@ describe("Task runner", function () {
 
 		var startedAt = new Date(),
 			tasks = [
-				libTools.makeTimeoutFn(100),
-				libTools.makeTimeoutFn(200),
-				libTools.makeTimeoutFn(300), // 100, [100, 200]
-				libTools.makeTimeoutFn(100), // 200, [100, 200]
-				libTools.makeTimeoutFn(200) // 300, [100, 200] => 500
+				libHelpers.makeTimeoutFn(100),
+				libHelpers.makeTimeoutFn(200),
+				libHelpers.makeTimeoutFn(300), // 100, [100, 200]
+				libHelpers.makeTimeoutFn(100), // 200, [100, 200]
+				libHelpers.makeTimeoutFn(200) // 300, [100, 200] => 500
 			],
 			index = 0,
 			resultCount = 0;
@@ -123,9 +124,9 @@ describe("Task runner", function () {
 
 		var startedAt = new Date(),
 			tasks = [
-				libTools.makeTimeoutFn(100),
-				libTools.makeTimeoutFn(200),
-				libTools.makeTimeoutFn(300)
+				libHelpers.makeTimeoutFn(100),
+				libHelpers.makeTimeoutFn(200),
+				libHelpers.makeTimeoutFn(300)
 			],
 			index = 0,
 			resultCount = 0;
@@ -156,14 +157,7 @@ describe("Task runner", function () {
 	it("can emit an 'end' event", function (done) {
 		var tr = new TaskRunner(3, 2);
 
-		var startedAt = new Date(),
-			tasks = [
-				,
-				libTools.makeTimeoutFn(200),
-				libTools.makeTimeoutFn(300)
-			],
-			readyCount = 0,
-			resultCount = 0;
+		var readyCount = 0;
 
 		expect(tr.total).toEqual(2);
 		expect(tr.ended).toEqual(false);
@@ -171,11 +165,11 @@ describe("Task runner", function () {
 		tr.on("ready", function () {
 			if (readyCount === 0) {
 				expect(tr.tasks).toEqual(0);
-				tr.run("a", libTools.makeTimeoutFn(100));
+				tr.run("a", libHelpers.makeTimeoutFn(100));
 				expect(tr.tasks).toEqual(1);
-				tr.run("b", libTools.makeTimeoutFn(200));
+				tr.run("b", libHelpers.makeTimeoutFn(200));
 				expect(tr.tasks).toEqual(2);
-				tr.run("c", libTools.makeTimeoutFn(300));
+				tr.run("c", libHelpers.makeTimeoutFn(300));
 				expect(tr.tasks).toEqual(2);
 				expect(tr.completed).toEqual(0);
 			}
@@ -202,8 +196,8 @@ describe("Task runner", function () {
 				return;
 			}
 			ran = true;
-			var ok1 = tr.run("key1", libTools.makeTimeoutFn(100));
-			var ok2 = tr.run("key2", libTools.makeTimeoutFn(100));
+			var ok1 = tr.run("key1", libHelpers.makeTimeoutFn(100));
+			var ok2 = tr.run("key2", libHelpers.makeTimeoutFn(100));
 			expect(ok1).toEqual(true);
 			expect(ok2).toEqual(false);
 		});
