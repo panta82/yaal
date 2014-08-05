@@ -95,7 +95,6 @@ describe("Yaal", function () {
 			libHelpers.expectTimestamp(expect, meta[2].startedAt, startedAt.getTime() + 100);
 			libHelpers.expectTimestamp(expect, meta[2].completedAt, startedAt.getTime() + 400);
 
-			//expect(res[0][0]).toEqual()
 			done();
 		});
 	});
@@ -109,18 +108,14 @@ describe("Yaal", function () {
 				libHelpers.makeTimeoutFn(100, null),
 				libHelpers.makeTimeoutFn(100, null)
 			];
-		done();
-/*
+
 		yaal(yaal, [[fns, 1, "meta"], [fns, 5, "meta"], [fns, true, "meta"], [fns, false, "meta"]], function (_, res) {
-			var elapsed = new Date() - startedAt;
-		});
+			libHelpers.expectTimestamp(expect, res[0][1].completedAt, startedAt.getTime() + 500);
+			libHelpers.expectTimestamp(expect, res[1][1].completedAt, startedAt.getTime() + 100);
+			libHelpers.expectTimestamp(expect, res[2][1].completedAt, startedAt.getTime() + 100);
+			libHelpers.expectTimestamp(expect, res[3][1].completedAt, startedAt.getTime() + 500);
 
-
-		yaal(fns, 1, function () {
-			var elapsed = new Date() - startedAt;
-			expect(elapsed).toBeGreaterThan(500);
-			expect(elapsed).toBeLessThan(520);
 			done();
-		});*/
+		});
 	});
 });
