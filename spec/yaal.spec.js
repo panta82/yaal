@@ -70,6 +70,36 @@ describe("Yaal", function () {
 		});
 	});
 
+	it("should respect meta switch", function (done) {
+		var startedAt = new Date(),
+			fns = [
+				libHelpers.makeTimeoutFn(100, null),
+				libHelpers.makeTimeoutFn(200, null, "11"),
+				libHelpers.makeTimeoutFn(300, null, "21", "22")
+			];
+
+		yaal(fns, 2, yaal.meta, function (_1, _2, meta) {
+			var completedAt = new Date();
+
+			libHelpers.expectTimestamp(expect, completedAt, startedAt.getTime() + 400);
+
+			libHelpers.expectTimestamp(expect, meta.startedAt, startedAt);
+			libHelpers.expectTimestamp(expect, meta.completedAt, completedAt);
+
+			libHelpers.expectTimestamp(expect, meta[0].startedAt, startedAt);
+
+
+			libHelpers.expectTimestamp(expect, meta[0].completedAt, startedAt.getTime() + 100);
+			libHelpers.expectTimestamp(expect, meta[1].startedAt, startedAt);
+			libHelpers.expectTimestamp(expect, meta[1].completedAt, startedAt.getTime() + 200);
+			libHelpers.expectTimestamp(expect, meta[2].startedAt, startedAt.getTime() + 100);
+			libHelpers.expectTimestamp(expect, meta[2].completedAt, startedAt.getTime() + 400);
+
+			//expect(res[0][0]).toEqual()
+			done();
+		});
+	});
+
 	it("should correctly interpret parallelism options", function (done) {
 		var startedAt = new Date(),
 			fns = [
@@ -79,10 +109,9 @@ describe("Yaal", function () {
 				libHelpers.makeTimeoutFn(100, null),
 				libHelpers.makeTimeoutFn(100, null)
 			];
-
 		done();
-
-		/*yaal(yaal, [[fns, 1], [fns, 5], [fns, true], [fns, false]], function (_, res) {
+/*
+		yaal(yaal, [[fns, 1, "meta"], [fns, 5, "meta"], [fns, true, "meta"], [fns, false, "meta"]], function (_, res) {
 			var elapsed = new Date() - startedAt;
 		});
 

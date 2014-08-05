@@ -36,3 +36,11 @@ exports.asyncAddSub = function asyncAddSub(a, b, callback) {
 		}
 	}, 100);
 };
+
+exports.expectTimestamp = function expectTimestamp(expect, ts, target, precision) {
+	precision = precision || 20;
+	ts = ts.getTime ? ts.getTime() : ts;
+	target = target.getTime ? target.getTime() : target;
+	expect(ts).toBeGreaterThan(target - precision);
+	expect(ts).toBeLessThan(target + precision);
+};
