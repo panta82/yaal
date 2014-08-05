@@ -1,6 +1,4 @@
-var libTools = require("../lib/tools"),
-
-	ArrayResultCollector = require("../lib/results/arrayResultCollector");
+var ArrayResultCollector = require("../lib/results/arrayResultCollector");
 
 describe("Array result converter", function () {
 
@@ -8,7 +6,7 @@ describe("Array result converter", function () {
 		var arc = new ArrayResultCollector();
 		arc.submit(0, [null, "res0"]);
 		arc.submit(1, [null, "res1"]);
-		arc.done(function (err, res) {
+		arc.done(function (err) {
 			expect(err).toEqual(null);
 			done();
 		});
