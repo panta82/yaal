@@ -1,5 +1,5 @@
 var libTools = require("../lib/tools"),
-	TaskRunner = require("../lib/taskRunner");
+	TaskRunner = require("../lib/tasks/taskRunner");
 
 var tr = new TaskRunner(3, 2);
 
