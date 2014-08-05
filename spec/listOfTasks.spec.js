@@ -21,27 +21,42 @@ describe("List of tasks", function () {
 		});
 	});
 
-	it("should execute and return crumpled args with errors", function (done) {
+	it("should correctly pass on arguments", function (done) {
 		var fns = [
-			libTools.makeTimeoutFn(100, null, "res1"),
-			libTools.makeTimeoutFn(200, new Error("err2")),
-			libTools.makeTimeoutFn(150, null, "res3", "additional")
+			function (x, y, cb) {
+				cb(null, (x + 10) / y);
+			},
+			function (x, y, cb) {
+				cb(null, (x - 10) * y);
+			},
+			function (x, y, cb) {
+				cb(new Error("3"));
+			}
 		];
-		yaal(fns, function (err, res) {
-			expect(err.length).toEqual(3);
-			expect(err.count).toEqual(1);
-			expect(err[0]).toEqual(null);
-			expect(err[1].message).toEqual("err2");
-			expect(err[2]).toEqual(null);
+		yaal(fns, [20, 3], function (err, res) {
+			expect(err.any().message).toEqual("3");
+			expect(res[0]).toEqual(10);
+			expect(res[1]).toEqual(30);
+			done();
+		});
+	});
 
-			expect(res.length).toEqual(3);
-			expect(res.count).toEqual(2);
-			expect(res[0].length).toEqual(1);
-			expect(res[0][0]).toEqual("res1");
-			expect(res[1].length).toEqual(0);
-			expect(res[2].length).toEqual(2);
-			expect(res[2][0]).toEqual("res3");
-			expect(res[2][1]).toEqual("additional");
+	it("should correctly interpret synchronisity", function (done) {
+		var fns = [
+			function (x, y, cb) {
+				cb(null, (x + 10) / y);
+			},
+			function (x, y, cb) {
+				cb(null, (x - 10) * y);
+			},
+			function (x, y, cb) {
+				cb(new Error("3"));
+			}
+		];
+		yaal(fns, [20, 3], function (err, res) {
+			expect(err.any().message).toEqual("3");
+			expect(res[0]).toEqual(10);
+			expect(res[1]).toEqual(30);
 			done();
 		});
 	});
