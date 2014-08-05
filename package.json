@@ -1,6 +1,6 @@
 {
 	"name": "yaal",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"description": "Yet another async library. Trying to pack all the options one might need into a single fn call",
 	"main": "index.js",
 	"scripts": {
