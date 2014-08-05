@@ -170,4 +170,22 @@ describe("Array result converter", function () {
 			}
 		});
 	});
+
+	it("can return first result or error", function (done) {
+		var arc = new ArrayResultCollector();
+		arc.submit(0, [null]);
+		arc.submit(1, [new Error("err1")]);
+		arc.submit(2, [null, "res2"]);
+		arc.submit(3, [new Error("err3")]);
+
+		arc.done(function (err, res) {
+			var firstErr = err.first(),
+				firstRes = res.first();
+
+			expect(firstErr.message).toEqual("err1");
+			expect(firstRes).toEqual("res2");
+
+			done();
+		});
+	});
 });
