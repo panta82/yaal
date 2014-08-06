@@ -1,3 +1,3 @@
 #!/bin/sh
 
-jasmine-node --captureExceptions spec/
+jasmine-node --captureExceptions $@ spec/

@@ -86,28 +86,75 @@ describe("Array result converter", function () {
 		});
 	});
 
-	it("can convert crumpled results into flat", function (done) {
-		var arc = new ArrayResultCollector();
-		arc.submit(0, [null, "0"]);
-		arc.submit(1, [null]);
-		arc.submit(2, [null, "21", "22"]);
-		arc.done(function (err, res) {
-			var flat = res.toFlat();
-			res.flatten();
+	describe("can flatten the results", function () {
+		function testFlatten(done, index, fluid, testFn) {
+			var arc = new ArrayResultCollector();
+			arc.submit(0, [null, "01"]);
+			arc.submit(1, [null]);
+			arc.submit(2, [null, "21", "22", "23"]);
+			arc.submit(3, [null, "31", "32"]);
+			arc.done(function (err, res) {
+				var flat = res.toFlat(index, fluid);
+				res.flatten(index, fluid);
 
-			expect(flat !== res).toBeTruthy();
-			test(res);
-			test(flat);
+				expect(flat).not.toBe(res);
+				testFn(res);
+				testFn(flat);
 
-			done();
+				done();
+			});
+		}
 
-			function test(arr) {
+		it("by keeping all the existing values (not picking)", function (done) {
+			testFlatten(done, undefined, undefined, function (arr) {
+				expect(arr.length).toEqual(6);
+				expect(arr[0]).toEqual("01");
+				expect(arr[1]).toEqual("21");
+				expect(arr[2]).toEqual("22");
+				expect(arr[3]).toEqual("23");
+				expect(arr[4]).toEqual("31");
+				expect(arr[5]).toEqual("32");
+			});
+		});
+
+		it("by picking rigidly from the left", function (done) {
+			testFlatten(done, 0, undefined, function (arr) {
 				expect(arr.length).toEqual(4);
-				expect(arr[0]).toEqual("0");
+				expect(arr[0]).toEqual("01");
 				expect(arr[1]).toEqual(undefined);
 				expect(arr[2]).toEqual("21");
-				expect(arr[3]).toEqual("22");
-			}
+				expect(arr[3]).toEqual("31");
+			});
+		});
+
+		it("by picking rigidly from the right", function (done) {
+			testFlatten(done, -2, undefined, function (arr) {
+				expect(arr.length).toEqual(4);
+				expect(arr[0]).toEqual(undefined);
+				expect(arr[1]).toEqual(undefined);
+				expect(arr[2]).toEqual("22");
+				expect(arr[3]).toEqual("31");
+			});
+		});
+
+		it("by picking fluidly from the left", function (done) {
+			testFlatten(done, 2, true, function (arr) {
+				expect(arr.length).toEqual(4);
+				expect(arr[0]).toEqual("01");
+				expect(arr[1]).toEqual(undefined);
+				expect(arr[2]).toEqual("23");
+				expect(arr[3]).toEqual("32");
+			});
+		});
+
+		it("by picking fluidly from the right", function (done) {
+			testFlatten(done, -2, true, function (arr) {
+				expect(arr.length).toEqual(4);
+				expect(arr[0]).toEqual("01");
+				expect(arr[1]).toEqual(undefined);
+				expect(arr[2]).toEqual("22");
+				expect(arr[3]).toEqual("31");
+			});
 		});
 	});
 
