@@ -1,9 +1,9 @@
-var ArrayResultCollector = require("../lib/results/arrayResultCollector");
+var ArrayCollector = require("../lib/collectors/arrayCollector");
 
-describe("Array result converter", function () {
+describe("Array collector", function () {
 
 	it("can convert no errors into null", function (done) {
-		var arc = new ArrayResultCollector();
+		var arc = new ArrayCollector();
 		arc.submit(0, [null, "res0"]);
 		arc.submit(1, [null, "res1"]);
 		arc.done(function (err) {
@@ -13,7 +13,7 @@ describe("Array result converter", function () {
 	});
 
 	it("can record errors and produce flat results", function (done) {
-		var arc = new ArrayResultCollector();
+		var arc = new ArrayCollector();
 		arc.submit(2, [null, "res2"]);
 		arc.submit(1, [new Error("err1")]);
 		arc.submit(0, [null, "res0"]);
@@ -35,7 +35,7 @@ describe("Array result converter", function () {
 	});
 
 	it("can record multiple callback args and produce crumpled results", function (done) {
-		var arc = new ArrayResultCollector();
+		var arc = new ArrayCollector();
 		arc.submit(2, [null, "res2", "21"]);
 		arc.submit(1, [null]);
 		arc.submit(0, [null, "res0"]);
@@ -63,32 +63,9 @@ describe("Array result converter", function () {
 		});
 	});
 
-	it("can convert flat results into crumpled", function (done) {
-		var arc = new ArrayResultCollector();
-		arc.submit(0, [null, "res0"]);
-		arc.submit(1, [null]);
-		arc.done(function (err, res) {
-			var crumpled = res.toCrumpled();
-			res.crumple();
-
-			expect(crumpled !== res).toBeTruthy();
-
-			test(res);
-			test(crumpled);
-
-			done();
-
-			function test(arr) {
-				expect(arr[0].length).toEqual(1);
-				expect(arr[0][0]).toEqual("res0");
-				expect(arr[1].length).toEqual(0);
-			}
-		});
-	});
-
 	describe("can flatten the results", function () {
 		function testFlatten(done, index, fluid, testFn) {
-			var arc = new ArrayResultCollector();
+			var arc = new ArrayCollector();
 			arc.submit(0, [null, "01"]);
 			arc.submit(1, [null]);
 			arc.submit(2, [null, "21", "22", "23"]);
@@ -159,7 +136,7 @@ describe("Array result converter", function () {
 	});
 
 	it("can compact errors and flat results", function (done) {
-		var arc = new ArrayResultCollector();
+		var arc = new ArrayCollector();
 		arc.submit(0, [null, "res0"]);
 		arc.submit(1, [null, "res1"]);
 		arc.submit(2, [new Error("err2")]);
@@ -194,7 +171,7 @@ describe("Array result converter", function () {
 	});
 
 	it("can compact crumpled results", function (done) {
-		var arc = new ArrayResultCollector();
+		var arc = new ArrayCollector();
 		arc.submit(0, [null, "00", "01"]);
 		arc.submit(1, [null]);
 		arc.submit(2, [null, "20"]);
@@ -218,19 +195,19 @@ describe("Array result converter", function () {
 		});
 	});
 
-	it("can return first result or error", function (done) {
-		var arc = new ArrayResultCollector();
+	it("can extract any result or error", function (done) {
+		var arc = new ArrayCollector();
 		arc.submit(0, [null]);
 		arc.submit(1, [new Error("err1")]);
 		arc.submit(2, [null, "res2"]);
 		arc.submit(3, [new Error("err3")]);
 
 		arc.done(function (err, res) {
-			var firstErr = err.first(),
-				firstRes = res.first();
+			var anyErr = err.any(),
+				anyRes = res.any();
 
-			expect(firstErr.message).toEqual("err1");
-			expect(firstRes).toEqual("res2");
+			expect(anyErr.message).toEqual("err1");
+			expect(anyRes).toEqual("res2");
 
 			done();
 		});

@@ -1,9 +1,9 @@
 var libTools = require("../lib/tools"),
 
-	ArrayResultCollector = require("../lib/results/arrayResultCollector");
+	ArrayCollector = require("../lib/collectors/arrayCollector");
 
 if (false) (function () {
-	var arc = new ArrayResultCollector();
+	var arc = new ArrayCollector();
 	arc.submit(0, [null, "00", "01"]);
 	arc.submit(1, [null]);
 	arc.submit(2, [null, "20"]);
@@ -23,8 +23,8 @@ if (false) (function () {
 	});
 })();
 
-if (true) (function () {
-	var arc = new ArrayResultCollector();
+if (false) (function () {
+	var arc = new ArrayCollector();
 	arc.submit(0, [null, "0"]);
 	arc.submit(1, [null, "11", "12", "13"]);
 	arc.submit(2, [null, "21", "22"]);
@@ -38,3 +38,21 @@ if (true) (function () {
 		}
 	});
 })();
+
+if (true) (function () {
+	testFlatten(undefined, undefined, function (flat) {
+		console.log(flat);
+	});
+})();
+
+function testFlatten(index, fluid, testFn) {
+	var arc = new ArrayCollector();
+	arc.submit(0, [null, "01"]);
+	arc.submit(1, [null]);
+	arc.submit(2, [null, "21", "22", "23"]);
+	arc.submit(3, [null, "31", "32"]);
+	arc.done(function (err, res) {
+		var flat = res.toFlat(index, fluid);
+		testFn(flat);
+	});
+}
