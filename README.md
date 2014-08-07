@@ -1,96 +1,278 @@
 # YAAL
 
-### or, Yet Another Async LibraryYAAL <small>(clever, huh?)</small>
-
 ----
 
-Yet another async library. Execute any number of tasks, with any number of arguments, in parallel or series. Recieve all the results, and then easily parse them to get the data you need. All you need is ingle function call:
+Or, Yet Another Async Library <small>(clever, huh?)</small>. Execute any number of tasks, with any number of arguments, in parallel or series. Receive all the results, and then easily parse them to get the data you need. The one async function to rule them all.
 
 ```javascript
 	// Stat a group of files, one at the time
-    yaal(fs.stat, ["file1.txt", "file2.txt", "missing.txt"], 1, function (err, res) {
+    yaal(fs.stat, ["file1.txt", "file2.txt", "missing"], 1, function (err, res) {
     	if (err) {
         	console.log("One of the raised errors: " + err.any());
         }
         
-        // Let's process all the recieved stats, skipping undefineds
+        // Let's process all the received stats, skipping those not found
         res.compact().forEach(processStat);
     });
 ```
 
+[Click to skip the boring stuff and see more code.](#more_code)
 
-##### Background: 
 
-I know what you're thinking.
+----
+### Background
 
- - "Are you insane?"
- - "Isn't there enough async libraries already?"
- - "Don't you have anything better to do with your time?"
+I know what you're thinking. "Are you insane?" "Isn't there enough async libraries already?" "Don't you have anything better to do with your time?"
 
 Maybe on all three counts.
 
-The truth is, I really liked the excellent [js async library](https://github.com/caolan/async),
-except I needed a few additional features. For example, I needed to be able to get all the received data and not just the first raised error. Also, to be able to interrupt the execution upon receiving a truthy result (without the error hacks). On the other hand, async has a lot of functionality that I didn't really need.
+The truth is, I really liked the excellent [js async library](https://github.com/caolan/async). It's just that I needed a few additional features. Like the ability to get all the results, even if there was an error. Or to handle ALL the raised errors, not just the first one.
 
-I started hacking on the async, intent on adding the features I needed, but then I started thinking about all the ways async methods could be made more powerful. I decided I really wanted the ability to swallow the errors, and then later process them. Also, that I would need to wrap them into some kind of utility to ease the processing inside the callback. I looked around, but surprisingly none of the other libraries I found had the kind of interface I envisioned. Furthermore, they all suffered from the crippling deficit of being invented nowhere near my house or even the surrounding area.
+I started hacking away, intent on adding the features I needed, but then I started thinking about all the ways async methods could be made more powerful. I decided the correct approach was to wrap raised errors (and results) into custom objects, to allow for easier processing. Also, I preferred one versatile function in place of many simple ones (less verbose API). I thought I came up with a really cool idea. I looked around, but surprisingly none of the other libraries I found had the kind of interface I envisioned. Furthermore, they all suffered from the crippling deficit of being invented nowhere near my house or even the surrounding area.
 
 Thus, ***yaal*** was born.
 
-**TLDR:** *I wanted a single powerful async function that swallows errors and allows you to easily process them afterwards. I made yaal*
+**TLDR:** *I wanted something like async.js that doesn't stop on first error. I made yaal*
 
-##### Features:
+----
+### Features
 
-For now, just the simple usage methodology. This will be replaced with proper docs once I'm done.
+ - Single function with versatile arguments. `var yaal = require("yaal"); yaal(/*...*/);`
+ - Three execution modes:
+  - Array of tasks, receive array of results
+  - Hash of tasks, receive hash of results
+  - Single task, executed on array of arguments, receive array of results
+ - Versatile result and error handling
+ - Execute in series, in parallel or with custom number of parallel tasks at once
+ - Provides metadata about timings of each task (useful in profiling)
+ - Full test suite and [documentation](#documentation)
+ - No dependencies
+ 
+----
+<a name="documentation"></a>
+### Documentation
+
+#### Basics
+
+Here's how you use yaal:
+
+> `yaal(fn, <[args]>, <true/false/number>, <"switch1", "switch2">, <options>, <callback>)`
+
+`fn` must be the first argument. It can be one of:
+
+- **An array**: Execute a list of tasks using args for each
+- **A hash**: Execute each value in the hash using args for each
+- **A function**: Execute function on each argument
+
+Args (the second arguments) isn't mandatory. Callback must be the last argument. Everything in between is interpreted as one of:
+
+- **parallelism**: A number or true/false. Determines how many tasks can be executed at once. `true` is for infinite, `false` for 1. Defaults to `true`.
+- **switches**: Some of the options can be switched to `true` by providing their key as an argument. Case-sensitive.
+- **options**: Options hash (a last resort). The full list of options is available inside [vars.js](lib/vars.js) file.
+
+#### Count
+
+Every yaal custom object has property `count`.
+
+> `<err/res/meta>.count`
+
+It represents the number of actual values that are in the array / hash. For example, if a single error is raised, results array will have one less count than its length.
 
 ```javascript
-var yaal = require("yaal");
-
-// General usage pattern
-// yaal(fns, args, asynchronisity, callback);
-
-// Execute multiple functions (provided as array), each with an argument list
-var tasks = [fn1, fn2];
-yaal(tasks, ["test", null, 2], function (err, res) {
-	// Case with no errors
-	test(err, null);
-	test(res, ["res1", "res2"]);
-
-	// Case with error from fn2
-	test(err, [null, "err2"]);
-	test(res, ["res1", undefined]);
-	test(err.first(), "err2");
-	test(err.compress(), ["err2"]);
-	test(res.compress(), ["res1"]);
-	test(res.toHash(tasks), {
-		fn1: "res1",
-		fn2: undefined
-	});
-});
-
-// Execute single function, on each of the provided arguments
-// (note that fn is outside an array)
-yaal(toUpperCase, ["a", "b", "c"], function (err, res) {
-	// Case with errors from b and c
-	test(err, [null, "errb", "errc"]);
-	test(res, ["A", undefined, undefined]);
-	test(err.compress(), ["errb", "errc"]);
-});
-
-// Execute multiple functions as hash.
-yaal({ "a": f1, "b": f2 }, function (err, res) {
-	// Case where 'b' failed
-	test(err, { "a": null, "b": "errb" });
-	test(res, { "a": "resa", "b": undefined});
-});
-
-// The third argument - asynchronisity. Can be:
-//    A number (1, 2, ...) - this is how many tasks can run at same time
-//    true (default) - run everything at the same time
-//    false (the same as 1) - run functions one at a time (Serial from async.js)
-yaal([fn1, fn2], ["test", null, 2], 1, function (err, res) {
-    err = null;
-    err = [null, new Error("From fn2")];
-    res = ["success", undefined];
-});
-
+yaal(
+    [function (cb) { cb(new Error()); },
+    function (cb) { cb(null, "a"); },
+    function (cb) { cb(null, "b", "c"); }],
+    function (err, res) {
+		console.log(err.length); // > 3
+		console.log(err.count); // > 1
+		console.log(res.length); // > 3
+		console.log(res.count); // > 2
+    });
+)
 ```
+
+#### Compact
+
+Gets rid of the empty values in errors or results array / hash.
+
+> `<err/res>.compact()`
+
+Note this also removes the information on which function led to which outcome. After calling `compact()` on an array, `count` property should be the same as `length`.
+
+```javascript
+		// ... continuing from previous code
+		console.log(err.compact().length); // > 1
+		console.log(res.compact()); // > [["a"], ["b", "c"]]
+```
+
+#### Flat and flatten
+
+Normally, each task is expected to return a single value in its callback. These values then become members of the results (res) array or properties on the res hash.. Such array or hash is then considered "flat" and has `flat` property set to `true`.
+
+> `res.flat`
+
+However, if any of your callbacks return multiple values, all the results will become *"nested"* within arrays. Flat property will be set to `false`.
+
+```javascript
+yaal(
+    [function (cb) { cb(null); },
+    function (cb) { cb(null, "a"); },
+    function (cb) { cb(null, "b", "c"); }],
+    function (err, res) {
+    	console.log(res.flat); // > false
+        console.log(res[0]); // > []
+        console.log(res[1]); // > ["a"]
+        console.log(res[2]); // > ["b", "c"]
+    });
+)
+```
+
+If you want to get rid of the nesting, you can use the `flatten` function.
+
+> `res.flatten(<index>, <fluid>)`
+
+Without any arguments, all elements are preserved. In case of an array, the values are just dumped into a new array with the "empty" ones removed. In case of hashes, they are moved under new properties that follow the naming convention "`<oldname>_<index> = <value>`". In case where there is just one value, the old name is preserved. 
+
+```javascript
+		var res2 = res.flatten();
+        console.log(res2.flat); // > true
+        console.log(res2); // > ["a", "b", "c"]
+```
+
+If you call flatten with an index, it will extract only a single value for each result and throw away the rest.
+
+```javascript
+		console.log(res.flatten(1)); // > [undefined, undefined, "c"]
+```
+
+Notice that, in this case, the `undefined` from the first callback was left intact. You can use negative value to index the array from the end.
+
+If the second argument is true, we will try to find the first non-empty value if the index overflows (like it did in the previous example).
+
+```javascript
+		console.log(res.flatten(-1)); // > [undefined, "a", "b"]
+```
+
+#### Any
+
+If you just want any value from the errors or results array / hash, you can call
+
+> `<err/res>.any()`
+
+```javascript
+yaal(
+    [function (cb) { cb(new Error("1")); },
+    function (cb) { cb(new Error("2")); }],
+    function (err, res) {
+    	console.log(err.any().message); // > 1
+    });
+)
+```
+
+Currently, for arrays it returns the first value, but it shouldn't be relied upon.
+
+#### Meta
+
+If you provide `meta` switch in the arguments, or set `meta: true` in options, callback will be given a value with detailed execution times of the tasks. It will follow the same format of res and err: array for array, hash for hash.
+
+```javascript
+yaal(fns, args, "meta", function (err, _, meta) {
+	console.log(meta.startedAt); // > when we called yaal()
+    console.log(meta.completedAt); // > when all the tasks ended
+    console.log(meta[0].startedAt, meta[0].completedAt); // > times for the first task
+});
+```
+
+----
+
+<a name="more_code"></a>
+### Code examples
+
+Execute a list of tasks in parallel. Handle all the errors.
+
+```javascript
+yaal([
+      saveToDB,
+      writeToLog,
+      sendToAffiliates
+  ],
+  [customerLead],
+  function (err) {
+	if (err) {
+    	err.compact().forEach(that.emit.bind(that, "error"));
+    }
+});
+```
+
+Load records into a hash. Escape in case of any error.
+
+```javascript
+var records = {
+	user: getUserDetails,
+    offers: getOffers,
+    cart: getCart
+};
+yaal(records, [dc, userId], function (err, res) {
+	if (err) {
+    	return handleError(err.any());
+    }
+    console.log("User " + res.user.name + " has " + res.offers.length + " available offers");
+});
+```
+
+Ping each server in a list, performing max 10 pings at one time. Take only the time values.
+
+```javascript
+function ping(ip, callback) {
+    // ...
+    callback(null, success, ms, raw);
+}
+
+yaal(ping, ips, 10, function (err, res) {
+	if (err) {
+    	err.forEach(function (e, i) {
+        	if (e) console.log("Couldn't ping ip " + ips[i] + ": " + e.message);
+        });
+        return;
+    }
+    console.log(res[0]); // > ["success", 15, {stdout: "...", stderr: "..."}]
+    var times = res.flatten(1);
+    console.log(times[0]); // > 15
+});
+```
+
+Query multiple databases (with multiple arguments each). Compare the response times using the `meta` switch.
+
+```javascript
+	yaal(testQuery, [[mySQLConn, args], [postgreSQL, args]], 1, "meta", function (err, _, meta) {
+    	if (err) { return; }
+        
+        console.log("It took MySQL " + (meta[0].completedAt - meta[0].startedAt) + " ms");
+        console.log("Total: " + (meta.completedAt - meta.startedAt) + " ms");
+    });
+```
+
+Want more? Check out the [documentation](#documentation) examples and `spec/` folder.
+
+----
+
+### TODO
+
+Ideas for future updates. Near the top: expect them soon. Near the bottom: meh.
+
+- `first` switch. Stop execution and return with the first truthy value. One result is returned. Sort of useful for a "find" functionality.
+- `fatal` switch. Any error is fatal and stops the execution. One error is returned. Like async.js.
+- Hash of functions with hash of arguments
+- `chain` switch: results from previous function used as arguments for the next one.
+- Callback commands. Instead of error, use the first argument in callback to provide all sorts of commands to the state machine. Primary use: `stop` command to end the execution immediately (but without an error)
+- `safe` switch to catch the errors and pretend they were in callback.
+- `repeat` switch. Repeat operation until error or `stop`.
+
+Your own ideas, feedback, bug reports or PR-s welcome.
+
+----
+
+### Licence
+
+Apache v2. Read it [here](LICENCE).
