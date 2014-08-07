@@ -1,13 +1,44 @@
-# YET ANOTHER ASYNC LIBRARY
-## (or YAAL <small><- clever, huh?</small>)
-=================================
+# YAAL
 
-Yet another async library.
+### or, Yet Another Async LibraryYAAL <small>(clever, huh?)</small>
+
+----
+
+Yet another async library. Execute any number of tasks, with any number of arguments, in parallel or series. Recieve all the results, and then easily parse them to get the data you need. All you need is ingle function call:
+
+```javascript
+	// Stat a group of files, one at the time
+    yaal(fs.stat, ["file1.txt", "file2.txt", "missing.txt"], 1, function (err, res) {
+    	if (err) {
+        	console.log("One of the raised errors: " + err.any());
+        }
+        
+        // Let's process all the recieved stats, skipping undefineds
+        res.compact().forEach(processStat);
+    });
+```
+
+
+##### Background: 
 
 I know what you're thinking.
 
-"Are you insane? Isn't there enough async libraries already? Don't you have anything better to do with your time?"
-Maybe on all three. Time will show.
+ - "Are you insane?"
+ - "Isn't there enough async libraries already?"
+ - "Don't you have anything better to do with your time?"
+
+Maybe on all three counts.
+
+The truth is, I really liked the excellent [js async library](https://github.com/caolan/async),
+except I needed a few additional features. For example, I needed to be able to get all the received data and not just the first raised error. Also, to be able to interrupt the execution upon receiving a truthy result (without the error hacks). On the other hand, async has a lot of functionality that I didn't really need.
+
+I started hacking on the async, intent on adding the features I needed, but then I started thinking about all the ways async methods could be made more powerful. I decided I really wanted the ability to swallow the errors, and then later process them. Also, that I would need to wrap them into some kind of utility to ease the processing inside the callback. I looked around, but surprisingly none of the other libraries I found had the kind of interface I envisioned. Furthermore, they all suffered from the crippling deficit of being invented nowhere near my house or even the surrounding area.
+
+Thus, ***yaal*** was born.
+
+**TLDR:** *I wanted a single powerful async function that swallows errors and allows you to easily process them afterwards. I made yaal*
+
+##### Features:
 
 For now, just the simple usage methodology. This will be replaced with proper docs once I'm done.
 
