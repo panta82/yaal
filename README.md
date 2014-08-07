@@ -37,7 +37,7 @@ Maybe on all three counts.
 
 The truth is, I really liked the excellent [js async library](https://github.com/caolan/async). It's just that I needed a few additional features. Like the ability to get all the results, even if there was an error. Or to handle ALL the raised errors, not just the first one.
 
-I started hacking away, intent on adding the features I needed, but then I started thinking about all the ways async methods could be made more powerful. I decided the correct approach was to wrap raised errors (and results) into custom objects, to allow for easier processing. Also, I preferred one versatile function in place of many simple ones (less verbose API). I thought I came up with a really cool idea. I looked around, but surprisingly none of the other libraries I found had the kind of interface I envisioned. Furthermore, they all suffered from the crippling deficit of being invented nowhere near here.
+So I started hacking at a solution. I decided the correct approach was to wrap all raised errors (and results) into custom objects, to allow for easier processing. Also, I preferred one versatile function in place of many simple ones (less verbose API). I thought I came up with a really cool idea. I looked around, but surprisingly none of the other libraries I found had the kind of interface I envisioned. Furthermore, they all suffered from the crippling deficit of being invented nowhere near here.
 
 Thus, ***yaal*** was born.
 
