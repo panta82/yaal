@@ -1,7 +1,7 @@
 {
 	"name": "yaal",
-	"version": "0.6.0",
-	"description": "Yet another async library. Trying to pack all the options one might need into a single fn call",
+	"version": "0.6.1",
+	"description": "Yet Another Async Library. Series or parallel, multiple tasks or one task many times. Error handling done right.",
 	"main": "index.js",
 	"scripts": {
 		"test": "./testall.sh"
