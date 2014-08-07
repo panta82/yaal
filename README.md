@@ -6,6 +6,7 @@ Or, Yet Another Async Library <small>(clever, huh?)</small>. Execute any number 
 
 ```javascript
 	// Stat a group of files, one at the time
+    var yaal = require("yaal");
     yaal(fs.stat, ["file1.txt", "file2.txt", "missing"], 1, function (err, res) {
     	if (err) {
         	console.log("One of the raised errors: " + err.any());
@@ -37,12 +38,12 @@ Thus, ***yaal*** was born.
 ----
 ### Features
 
- - Single function with versatile arguments. `var yaal = require("yaal"); yaal(/*...*/);`
+ - Single function with versatile arguments.
  - Three execution modes:
   - Array of tasks, receive array of results
   - Hash of tasks, receive hash of results
   - Single task, executed on array of arguments, receive array of results
- - Versatile result and error handling
+ - Powerful result and error handling
  - Execute in series, in parallel or with custom number of parallel tasks at once
  - Provides metadata about timings of each task (useful in profiling)
  - Full test suite and [documentation](#documentation)
@@ -275,4 +276,4 @@ Your own ideas, feedback, bug reports or PR-s welcome.
 
 ### Licence
 
-Apache v2. Read it [here](LICENCE).
+Apache v2. Read it [here](LICENSE).
