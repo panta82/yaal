@@ -200,6 +200,18 @@ yaal(fns, args, "meta", function (err, _, meta) {
 });
 ```
 
+#### Fatal
+
+Provide `fatal` in arguments or options to switch to the 'single error death' style of error handling, like in async.js. The first raised error will be immediately returned unwrapped. The remaining tasks will be cancelled.
+
+```javascript
+yaal([fnGood, fnBad], yaal.FATAL, function (err, res) {
+	console.log(err); // > Error: returned by fnBad
+    console.log(res.length); // > 2
+    console.log(res[0]); // > ??? (who knows, depends on the timing)
+});
+```
+
 ----
 
 <a name="more_code"></a>
