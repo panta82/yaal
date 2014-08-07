@@ -7,7 +7,7 @@ yaal(libHelpers.asyncToUppercase, ["a", "b", "c"], function (err, res) {
 	console.log(err, res);
 });
 
-if (true) (function () {
+if (false) (function () {
 	var fns = [
 			libHelpers.makeTimeoutFn(100, null),
 			libHelpers.makeTimeoutFn(200, null, "1"),
@@ -36,3 +36,16 @@ if (false) (function () {
 	});
 })();
 
+if (true) (function () {
+	var fns = [
+		libHelpers.makeTimeoutFn(50, null, "fn1"),
+		libHelpers.makeTimeoutFn(200, null, "fn2"),
+		libHelpers.makeTimeoutFn(100, new Error("showstopper")),
+		function (cb) {
+			cb(new Error("This function should never be called"));
+		}
+	];
+	yaal(fns, 2, "FATAL", function (err, res) {
+		console.log(err, res);
+	});
+})();
