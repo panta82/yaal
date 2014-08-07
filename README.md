@@ -4,6 +4,14 @@
 
 Or, Yet Another Async Library <small>(clever, huh?)</small>. Execute any number of tasks, with any number of arguments, in parallel or series. Receive all the results, and then easily parse them to get the data you need. The one async function to rule them all.
 
+Install with:
+
+```bash
+npm install yaal
+```
+
+Then use with:
+
 ```javascript
 	// Stat a group of files, one at the time
     var yaal = require("yaal");
@@ -29,7 +37,7 @@ Maybe on all three counts.
 
 The truth is, I really liked the excellent [js async library](https://github.com/caolan/async). It's just that I needed a few additional features. Like the ability to get all the results, even if there was an error. Or to handle ALL the raised errors, not just the first one.
 
-I started hacking away, intent on adding the features I needed, but then I started thinking about all the ways async methods could be made more powerful. I decided the correct approach was to wrap raised errors (and results) into custom objects, to allow for easier processing. Also, I preferred one versatile function in place of many simple ones (less verbose API). I thought I came up with a really cool idea. I looked around, but surprisingly none of the other libraries I found had the kind of interface I envisioned. Furthermore, they all suffered from the crippling deficit of being invented nowhere near my house or even the surrounding area.
+I started hacking away, intent on adding the features I needed, but then I started thinking about all the ways async methods could be made more powerful. I decided the correct approach was to wrap raised errors (and results) into custom objects, to allow for easier processing. Also, I preferred one versatile function in place of many simple ones (less verbose API). I thought I came up with a really cool idea. I looked around, but surprisingly none of the other libraries I found had the kind of interface I envisioned. Furthermore, they all suffered from the crippling deficit of being invented nowhere near here.
 
 Thus, ***yaal*** was born.
 
@@ -38,7 +46,8 @@ Thus, ***yaal*** was born.
 ----
 ### Features
 
- - Single function with versatile arguments.
+ - Simple installation and usage (single function)
+ - Callback mechanism, similar to async.js
  - Three execution modes:
   - Array of tasks, receive array of results
   - Hash of tasks, receive hash of results
@@ -73,11 +82,9 @@ Args (the second arguments) isn't mandatory. Callback must be the last argument.
 
 #### Count
 
-Every yaal custom object has property `count`.
-
 > `<err/res/meta>.count`
 
-It represents the number of actual values that are in the array / hash. For example, if a single error is raised, results array will have one less count than its length.
+The number of actual values that are in the array / hash. For example, if a single error is raised, results array will have one less count than its length.
 
 ```javascript
 yaal(
@@ -133,12 +140,20 @@ If you want to get rid of the nesting, you can use the `flatten` function.
 
 > `res.flatten(<index>, <fluid>)`
 
-Without any arguments, all elements are preserved. In case of an array, the values are just dumped into a new array with the "empty" ones removed. In case of hashes, they are moved under new properties that follow the naming convention "`<oldname>_<index> = <value>`". In case where there is just one value, the old name is preserved. 
+Without any arguments, all elements are preserved. In case of an array, the values are just dumped into a new array with the "empty" ones removed.
 
 ```javascript
 		var res2 = res.flatten();
         console.log(res2.flat); // > true
         console.log(res2); // > ["a", "b", "c"]
+```
+
+In case of hashes, they are moved under new properties that follow the naming convention "`<oldname>_<index> = <value>`". In case where there is just one value, the old name is preserved. 
+
+```javascript
+console.log(hash); // {x: ["a", "b"], y: ["c"], "z": []}
+var hash2 = hash.flatten();
+console.log(hash2); // {x_0: "a", x_1: "b", y: "c"}
 ```
 
 If you call flatten with an index, it will extract only a single value for each result and throw away the rest.
