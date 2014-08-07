@@ -63,11 +63,9 @@ describe("Hash collector", function () {
 			hc.submit("C", [null, "C1", "C2", "C3"]);
 			hc.submit("D", [null, "D1", "D2"]);
 			hc.done(function (err, res) {
-				var flat = res.toFlat(index, fluid);
-				res.flatten(index, fluid);
+				var flat = res.flatten(index, fluid);
 
 				expect(flat).not.toBe(res);
-				testFn(res);
 				testFn(flat);
 
 				done();
@@ -141,32 +139,20 @@ describe("Hash collector", function () {
 		hc.submit("C", [new Error("errC")]);
 
 		hc.done(function (err, res) {
-			var cErr = err.toCompact(),
-				cRes = res.toCompact();
-			err.compact();
-			res.compact();
+			var cErr = err.compact(),
+				cRes = res.compact();
 
-			testErr(err);
-			testErr(cErr);
+			expect(cErr.count).toEqual(1);
+			expect(cErr.hasOwnProperty("A")).toBeFalsy();
+			expect(cErr.hasOwnProperty("B")).toBeFalsy();
+			expect(cErr["C"].message).toEqual("errC");
 
-			testRes(res);
-			testRes(cRes);
+			expect(cRes.count).toEqual(2);
+			expect(cRes["A"]).toEqual("resA");
+			expect(cRes["B"]).toEqual("resB");
+			expect(cRes.hasOwnProperty("C")).toBeFalsy();
 
 			done();
-
-			function testErr(hash) {
-				expect(hash.count).toEqual(1);
-				expect(hash.hasOwnProperty("A")).toBeFalsy();
-				expect(hash.hasOwnProperty("B")).toBeFalsy();
-				expect(hash["C"].message).toEqual("errC");
-			}
-
-			function testRes(hash) {
-				expect(hash.count).toEqual(2);
-				expect(hash["A"]).toEqual("resA");
-				expect(hash["B"]).toEqual("resB");
-				expect(hash.hasOwnProperty("C")).toBeFalsy();
-			}
 		});
 	});
 
@@ -177,21 +163,15 @@ describe("Hash collector", function () {
 		hc.submit("C", [null, "C1"]);
 
 		hc.done(function (err, res) {
-			var cRes = res.toCompact();
-			res.compact();
+			var cRes = res.compact();
 
-			testRes(res);
-			testRes(cRes);
+			expect(cRes.count).toEqual(2);
+			expect(cRes["A"][0]).toEqual("A1");
+			expect(cRes["A"][1]).toEqual("A2");
+			expect(cRes.hasOwnProperty("B")).toBeFalsy();
+			expect(cRes["C"][0]).toEqual("C1");
 
 			done();
-
-			function testRes(hash) {
-				expect(hash.count).toEqual(2);
-				expect(hash["A"][0]).toEqual("A1");
-				expect(hash["A"][1]).toEqual("A2");
-				expect(hash.hasOwnProperty("B")).toBeFalsy();
-				expect(hash["C"][0]).toEqual("C1");
-			}
 		});
 	});
 

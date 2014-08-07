@@ -71,11 +71,9 @@ describe("Array collector", function () {
 			arc.submit(2, [null, "21", "22", "23"]);
 			arc.submit(3, [null, "31", "32"]);
 			arc.done(function (err, res) {
-				var flat = res.toFlat(index, fluid);
-				res.flatten(index, fluid);
+				var flat = res.flatten(index, fluid);
 
 				expect(flat).not.toBe(res);
-				testFn(res);
 				testFn(flat);
 
 				done();
@@ -143,31 +141,19 @@ describe("Array collector", function () {
 		arc.submit(2, [new Error("err2")]);
 
 		arc.done(function (err, res) {
-			var cErr = err.toCompact(),
-				cRes = res.toCompact();
-			err.compact();
-			res.compact();
+			var cErr = err.compact(),
+				cRes = res.compact();
 
-			testErr(err);
-			testErr(cErr);
+			expect(cErr.length).toEqual(1);
+			expect(cErr.count).toEqual(1);
+			expect(cErr[0].message).toEqual("err2");
 
-			testRes(res);
-			testRes(cRes);
+			expect(cRes.length).toEqual(2);
+			expect(cRes.count).toEqual(2);
+			expect(cRes[0]).toEqual("res0");
+			expect(cRes[1]).toEqual("res1");
 
 			done();
-
-			function testErr(arr) {
-				expect(arr.length).toEqual(1);
-				expect(arr.count).toEqual(1);
-				expect(arr[0].message).toEqual("err2");
-			}
-
-			function testRes(arr) {
-				expect(arr.length).toEqual(2);
-				expect(arr.count).toEqual(2);
-				expect(arr[0]).toEqual("res0");
-				expect(arr[1]).toEqual("res1");
-			}
 		});
 	});
 
@@ -178,21 +164,14 @@ describe("Array collector", function () {
 		arc.submit(2, [null, "20"]);
 
 		arc.done(function (err, res) {
-			var cRes = res.toCompact();
-			res.compact();
-
-			testRes(res);
-			testRes(cRes);
+			var cRes = res.compact();
+			expect(cRes.length).toEqual(2);
+			expect(cRes.count).toEqual(2);
+			expect(cRes[0][0]).toEqual("00");
+			expect(cRes[0][1]).toEqual("01");
+			expect(cRes[1][0]).toEqual("20");
 
 			done();
-
-			function testRes(arr) {
-				expect(arr.length).toEqual(2);
-				expect(arr.count).toEqual(2);
-				expect(arr[0][0]).toEqual("00");
-				expect(arr[0][1]).toEqual("01");
-				expect(arr[1][0]).toEqual("20");
-			}
 		});
 	});
 
