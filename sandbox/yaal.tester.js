@@ -7,7 +7,7 @@ yaal(libHelpers.asyncToUppercase, ["a", "b", "c"], function (err, res) {
 	console.log(err, res);
 });
 
-if (false) (function () {
+if (true) (function () {
 	var fns = [
 			libHelpers.makeTimeoutFn(100, null),
 			libHelpers.makeTimeoutFn(200, null, "1"),
@@ -15,11 +15,11 @@ if (false) (function () {
 		];
 
 	yaal(fns, 2, "meta", function (err, res, meta) {
-		console.log(err, res, meta);
+		console.log(meta);
 	});
 })();
 
-if (true) (function () {
+if (false) (function () {
 	var fns = [
 		function (x, y, cb) {
 			cb(null, (x + 10) / y);
