@@ -34,7 +34,7 @@ describe("Array collector", function () {
 		});
 	});
 
-	it("can record multiple callback args and produce crumpled results", function (done) {
+	it("can accept multiple arguments in callback and produce nested results", function (done) {
 		var arc = new ArrayCollector();
 		arc.submit(2, [null, "res2", "21"]);
 		arc.submit(1, [null]);
@@ -85,6 +85,7 @@ describe("Array collector", function () {
 		it("by keeping all the existing values (not picking)", function (done) {
 			testFlatten(done, undefined, undefined, function (arr) {
 				expect(arr.length).toEqual(6);
+				expect(arr.count).toEqual(6);
 				expect(arr[0]).toEqual("01");
 				expect(arr[1]).toEqual("21");
 				expect(arr[2]).toEqual("22");
@@ -170,7 +171,7 @@ describe("Array collector", function () {
 		});
 	});
 
-	it("can compact crumpled results", function (done) {
+	it("can compact nested results", function (done) {
 		var arc = new ArrayCollector();
 		arc.submit(0, [null, "00", "01"]);
 		arc.submit(1, [null]);
