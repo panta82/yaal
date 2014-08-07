@@ -218,7 +218,8 @@ yaal(records, [dc, userId], function (err, res) {
 	if (err) {
     	return handleError(err.any());
     }
-    console.log("User " + res.user.name + " has " + res.offers.length + " available offers");
+    console.log("User " + res.user.name + " has "
+    	+ res.offers.length + " available offers");
 });
 ```
 
@@ -246,11 +247,13 @@ yaal(ping, ips, 10, function (err, res) {
 Query multiple databases (with multiple arguments each). Compare the response times using the `meta` switch.
 
 ```javascript
-	yaal(testQuery, [[mySQLConn, args], [postgreSQL, args]], 1, "meta", function (err, _, meta) {
+	yaal(testQuery, [[myConn, x], [pgConn, y]], 1, "meta", function (err, _, meta) {
     	if (err) { return; }
         
-        console.log("It took MySQL " + (meta[0].completedAt - meta[0].startedAt) + " ms");
-        console.log("Total: " + (meta.completedAt - meta.startedAt) + " ms");
+        var elapsedMySQL = meta[0].completedAt - meta[0].startedAt,
+        	elapsed = meta.completedAt - meta.startedAt;
+        console.log("It took MySQL " + elapsedMySQL + " ms");
+        console.log("Total time: " + elapsed + " ms");
     });
 ```
 
