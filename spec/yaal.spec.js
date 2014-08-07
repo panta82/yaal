@@ -23,6 +23,28 @@ describe("Yaal", function () {
 		});
 	});
 
+	describe("when provided a hash of tasks", function () {
+		it("should execute them correctly", function (done) {
+			var fns = {
+				"A": libHelpers.makeTimeoutFn(100, null, "resA"),
+				"B": libHelpers.makeTimeoutFn(200, null, "resB"),
+				"C": libHelpers.makeTimeoutFn(5, new Error("errC")),
+				"count": libHelpers.makeTimeoutFn(150, null, "collision")
+			};
+			var startedAt = new Date();
+			yaal(fns, function (err, res) {
+				expect(err.count).toEqual(1);
+				expect(err.C.message).toEqual("errC");
+
+				expect(res.count).toEqual(2);
+				expect(res.A).toEqual("resA");
+				expect(res.B).toEqual("resB");
+				expect(new Date() - startedAt).toBeLessThan(220);
+				done();
+			});
+		});
+	});
+
 	describe("when provided a single task", function () {
 		it("should correctly execute with non-nested arguments", function (done) {
 			yaal(libHelpers.asyncToUppercase, ["a", "b", "c"], function (err, res) {
