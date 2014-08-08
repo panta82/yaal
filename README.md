@@ -292,7 +292,7 @@ Want more? Check out the [documentation](#documentation) examples and `spec/` fo
 
 Ideas for future updates. Near the top: expect them soon. Near the bottom: meh.
 
-- `first` switch. Stop execution and return with the first truthy value. One result is returned. Sort of useful for a "find" functionality.
+- ~~`first` switch. Stop execution and return with the first truthy value. One result is returned. Sort of useful for a "find" functionality.~~
 - ~~`fatal` switch. Any error is fatal and stops the execution. One error is returned. Like async.js.~~
 - Hash of functions with hash of arguments
 - `chain` switch: results from previous function used as arguments for the next one.

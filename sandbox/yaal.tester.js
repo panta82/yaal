@@ -36,7 +36,7 @@ if (false) (function () {
 	});
 })();
 
-if (true) (function () {
+if (false) (function () {
 	var fns = [
 		libHelpers.makeTimeoutFn(50, null, "fn1"),
 		libHelpers.makeTimeoutFn(200, null, "fn2"),
@@ -46,6 +46,22 @@ if (true) (function () {
 		}
 	];
 	yaal(fns, 2, "FATAL", function (err, res) {
+		console.log(err, res);
+	});
+})();
+
+if (true) (function () {
+	var fns = [
+		libHelpers.makeTimeoutFn(50, null),
+		libHelpers.makeTimeoutFn(150, null, "res1"),
+		libHelpers.makeTimeoutFn(100, new Error("err2")),
+		libHelpers.makeTimeoutFn(200, null, "res3"),
+		libHelpers.makeTimeoutFn(200, new Error("err4")),
+		function (cb) {
+			cb("No!");
+		}
+	];
+	yaal(fns, 3, yaal.FIRST, function (err, res) {
 		console.log(err, res);
 	});
 })();
