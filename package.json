@@ -2,7 +2,7 @@
 	"name": "yaal",
 	"version": "0.7.0",
 	"description": "Yet Another Async Library. Series or parallel, multiple tasks or one task many times. Error handling done right.",
-	"main": "index.js",
+	"main": "lib/yaal.js",
 	"scripts": {
 		"test": "./testall.sh"
 	},
