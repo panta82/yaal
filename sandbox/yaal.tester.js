@@ -50,7 +50,7 @@ if (false) (function () {
 	});
 })();
 
-if (true) (function () {
+if (false) (function () {
 	var fns = [
 		libHelpers.makeTimeoutFn(50, null),
 		libHelpers.makeTimeoutFn(150, null, "res1"),
@@ -63,5 +63,18 @@ if (true) (function () {
 	];
 	yaal(fns, 3, yaal.FIRST, function (err, res) {
 		console.log(err, res);
+	});
+})();
+
+if (true) (function () {
+	var fns = [
+		libHelpers.makeTimeoutFn(1, null, "x"),
+		function () {
+			throw new Error();
+		}
+	];
+
+	yaal(fns, 1, "meta, first", function (err, res, meta) {
+		console.log(err, res, meta);
 	});
 })();
