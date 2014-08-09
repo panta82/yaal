@@ -188,9 +188,9 @@ yaal(
 
 Currently, for arrays it returns the first value, but it shouldn't be relied upon.
 
-#### Meta
+#### `"meta"` switch
 
-If you provide `meta` switch in the arguments, or set `meta: true` in options, callback will be given a value with detailed execution times of the tasks. It will follow the same format of res and err: array for array, hash for hash.
+If you provide `"meta"` switch in the arguments, or set `meta: true` in options, callback will be given a value with detailed execution times of the tasks. It will follow the same format of res and err: array for array, hash for hash.
 
 ```javascript
 yaal(fns, args, "meta", function (err, _, meta) {
@@ -200,9 +200,9 @@ yaal(fns, args, "meta", function (err, _, meta) {
 });
 ```
 
-#### Fatal
+#### `"fatal"` switch
 
-Provide `fatal` in arguments or options to switch to the 'single error death' style of error handling, like in async.js. The first raised error will be immediately returned unwrapped. The remaining tasks will be cancelled.
+Provide `"fatal"` in arguments or options to switch to the 'single error death' style of error handling, like in async.js. The first raised error will be immediately returned unwrapped. The remaining tasks will be canceled.
 
 ```javascript
 yaal([fnGood, fnBad], yaal.FATAL, function (err, res) {
@@ -211,6 +211,21 @@ yaal([fnGood, fnBad], yaal.FATAL, function (err, res) {
     console.log(res[0]); // > ??? (who knows, depends on the timing)
 });
 ```
+
+#### `"first"` switch
+
+Provide `"first"` switch in arguments or options to return the first result (unwrapped) matching the criteria (by default, 'truthy'). Execution is immediately stopped and no further tasks processed. In case no result match the criteria, we return null (also configurable). 
+
+```javascript
+yaal(processors, item, "first", function (err, res) {
+	if (res) {
+		console.log("Processing result:" + res);
+	} else {
+		console.log("No processor was able to handle " + item);
+	}
+});
+```
+For details about the options, consult the [vars.js](lib/vars.js) file.
 
 ----
 
@@ -300,7 +315,7 @@ Ideas for future updates. Near the top: expect them soon. Near the bottom: meh.
 - `safe` switch to catch the errors and pretend they were in callback.
 - `repeat` switch. Repeat operation until error or `stop`.
 
-Your own ideas, feedback, bug reports or PR-s welcome.
+Your own ideas, feedback, bug reports or PRs welcome.
 
 ----
 
