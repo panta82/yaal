@@ -5,6 +5,7 @@ var libHelpers = require("./helpers"),
 describe("Yaal", function () {
 
 	describe("when provided a list of tasks", function () {
+
 		it("should execute them correctly", function (done) {
 			var fns = [
 				libHelpers.makeTimeoutFn(100, null, "res1"),
@@ -24,6 +25,7 @@ describe("Yaal", function () {
 	});
 
 	describe("when provided a hash of tasks", function () {
+
 		it("should execute them correctly", function (done) {
 			var fns = {
 				"A": libHelpers.makeTimeoutFn(100, null, "resA"),
@@ -46,6 +48,7 @@ describe("Yaal", function () {
 	});
 
 	describe("when provided a single task", function () {
+
 		it("should correctly execute with non-nested arguments", function (done) {
 			yaal(libHelpers.asyncToUppercase, ["a", "b", "c"], function (err, res) {
 				expect(err).toEqual(null);
@@ -170,6 +173,7 @@ describe("Yaal", function () {
 	});
 
 	describe("when supplied the 'fatal' switch", function () {
+
 		it("will stop upon the first error and return that error", function (done) {
 			var fns = [
 				libHelpers.makeTimeoutFn(50, null, "fn1"),
@@ -191,6 +195,7 @@ describe("Yaal", function () {
 	});
 
 	describe("when supplied the 'first' switch", function () {
+
 		it("will stop upon the first result and return that result", function (done) {
 			var fns = [
 				libHelpers.makeTimeoutFn(50, null),
@@ -212,6 +217,18 @@ describe("Yaal", function () {
 				done();
 			});
 		});
+
+		it("will return the correct result even if the first found is the last argument", function (done) {
+			var fns = [
+				libHelpers.makeTimeoutFn(1, null, false),
+				libHelpers.makeTimeoutFn(1, null, "res1")];
+			yaal(fns, 1, yaal.FIRST, function (err, res) {
+				expect(res).toBe("res1");
+
+				done();
+			});
+		});
+
 		it("will allow additional options", function (done) {
 			var noFn = libHelpers.makeTimeoutFn(1, null, -1, 1),
 				errFn = libHelpers.makeTimeoutFn(1, new Error()),
@@ -248,6 +265,7 @@ describe("Yaal", function () {
 	});
 
 	describe("if given multiple switches", function () {
+
 		it("can parse them as individual arguments", function (done) {
 			var fns = [
 				libHelpers.makeTimeoutFn(1, null, "x"),
@@ -264,6 +282,7 @@ describe("Yaal", function () {
 				done();
 			});
 		});
+
 		it("can parse them using comma notation", function (done) {
 			var fns = [
 				libHelpers.makeTimeoutFn(1, null, "x"),
