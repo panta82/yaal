@@ -66,7 +66,7 @@ Thus, ***yaal*** was born.
 
 Here's how you use yaal:
 
-> `yaal(fn, <[args]>, <true/false/number..."switch"...{options}>, <callback>)`
+> `yaal(fn, <[args]>, <true/false/number..."switch1,switch2"...{options}>, <callback>)`
 
 `fn` must be the first argument. It can be one of:
 
@@ -77,7 +77,7 @@ Here's how you use yaal:
 Args (the second arguments) isn't mandatory. Callback must be the last argument. Everything in between is interpreted as one of:
 
 - **parallelism**: A number or true/false. Determines how many tasks can be executed at once. `true` is for infinite, `false` for 1. Defaults to `true`.
-- **switches**: Some of the options can be switched to `true` by providing their key as an argument. Case-sensitive.
+- **switches**: Some of the options can be switched to `true` by providing 'magic' strings as arguments. All available switches are listed here and in [vars.js](lib/vars.js). You can also combine multiple switches inside one string. Eg: `"meta, first,fatal"`
 - **options**: Options hash (a last resort). The full list of options is available inside [vars.js](lib/vars.js) file.
 
 #### Count
@@ -300,6 +300,17 @@ Query multiple databases (with multiple arguments each). Compare the response ti
 ```
 
 Want more? Check out the [documentation](#documentation) examples and `spec/` folder.
+
+----
+
+### Updates
+
+Version|Date      |Description
+-------|----------|-----------
+0.6    |2014/08/07|Production ready
+0.7    |2014/08/08|Added `"fatal"` switch
+0.8    |2014/08/09|Added `"first"` switch
+0.8.1  |2014/08/09|Added comma notation for switches (`"switch1, switch2"`)
 
 ----
 
