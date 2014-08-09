@@ -66,7 +66,7 @@ Thus, ***yaal*** was born.
 
 Here's how you use yaal:
 
-> `yaal(fn, <[args]>, <true/false/number>, <"switch1", "switch2">, <options>, <callback>)`
+> `yaal(fn, <[args]>, <true/false/number..."switch"...{options}>, <callback>)`
 
 `fn` must be the first argument. It can be one of:
 
