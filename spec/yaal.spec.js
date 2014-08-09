@@ -246,4 +246,23 @@ describe("Yaal", function () {
 			);
 		});
 	});
+
+	describe("if given multiple switches", function () {
+		it("can parse them as individual arguments", function (done) {
+			var fns = [
+				libHelpers.makeTimeoutFn(1, null, "x"),
+				function () {
+					expect(false).toBe(true);
+				}
+			];
+
+			yaal(fns, 1, "meta", "first", function (err, res, meta) {
+				expect(err).toBe(null);
+				expect(res).toBe("x");
+				expect(meta).toBeTruthy();
+
+				done();
+			});
+		});
+	});
 });
