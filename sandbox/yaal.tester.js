@@ -19,7 +19,7 @@ if (false) (function () {
 	});
 })();
 
-if (false) (function () {
+if (true) (function () {
 	var fns = [
 		function (x, y, cb) {
 			cb(null, (x + 10) / y);
@@ -66,7 +66,7 @@ if (false) (function () {
 	});
 })();
 
-if (true) (function () {
+if (false) (function () {
 	var fns = [
 		libHelpers.makeTimeoutFn(1, null, "x"),
 		function () {
