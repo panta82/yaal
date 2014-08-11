@@ -303,7 +303,7 @@ Want more? Check out the [documentation](#documentation) examples and `spec/` fo
 
 ----
 
-### Updates
+### Feature updates
 
 Version|Date      |Description
 -------|----------|-----------

@@ -12,12 +12,12 @@
 	},
 	"keywords": [
 		"async",
-		"concurrent",
 		"asynchronous",
 		"parallel",
+		"series",
 		"multiple",
-		"callback",
-		"series"
+		"each",
+		"foreach"
 	],
 	"author": "panta82",
 	"license": "Apache 2",
