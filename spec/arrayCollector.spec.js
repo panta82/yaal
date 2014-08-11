@@ -134,62 +134,148 @@ describe("Array collector", function () {
 		});
 	});
 
-	it("can compact errors and flat results", function (done) {
-		var arc = new ArrayCollector();
-		arc.submit(0, [null, "res0"]);
-		arc.submit(1, [null, "res1"]);
-		arc.submit(2, [new Error("err2")]);
+	describe("when called compact()", function () {
 
-		arc.done(function (err, res) {
-			var cErr = err.compact(),
-				cRes = res.compact();
+		it("can compact errors and flat results", function (done) {
+			var arc = new ArrayCollector();
+			arc.submit(0, [null, "res0"]);
+			arc.submit(1, [null, "res1"]);
+			arc.submit(2, [new Error("err2")]);
 
-			expect(cErr.length).toEqual(1);
-			expect(cErr.count).toEqual(1);
-			expect(cErr[0].message).toEqual("err2");
+			arc.done(function (err, res) {
+				var cErr = err.compact(),
+					cRes = res.compact();
 
-			expect(cRes.length).toEqual(2);
-			expect(cRes.count).toEqual(2);
-			expect(cRes[0]).toEqual("res0");
-			expect(cRes[1]).toEqual("res1");
+				expect(cErr.length).toEqual(1);
+				expect(cErr.count).toEqual(1);
+				expect(cErr[0].message).toEqual("err2");
 
-			done();
+				expect(cRes.length).toEqual(2);
+				expect(cRes.count).toEqual(2);
+				expect(cRes[0]).toEqual("res0");
+				expect(cRes[1]).toEqual("res1");
+
+				done();
+			});
+		});
+
+		it("can compact nested results", function (done) {
+			var arc = new ArrayCollector();
+			arc.submit(0, [null, "00", "01"]);
+			arc.submit(1, [null]);
+			arc.submit(2, [null, "20"]);
+
+			arc.done(function (err, res) {
+				var cRes = res.compact();
+				expect(cRes.length).toEqual(2);
+				expect(cRes.count).toEqual(2);
+				expect(cRes[0][0]).toEqual("00");
+				expect(cRes[0][1]).toEqual("01");
+				expect(cRes[1][0]).toEqual("20");
+
+				done();
+			});
 		});
 	});
 
-	it("can compact nested results", function (done) {
-		var arc = new ArrayCollector();
-		arc.submit(0, [null, "00", "01"]);
-		arc.submit(1, [null]);
-		arc.submit(2, [null, "20"]);
+	describe("when called any()", function () {
 
-		arc.done(function (err, res) {
-			var cRes = res.compact();
-			expect(cRes.length).toEqual(2);
-			expect(cRes.count).toEqual(2);
-			expect(cRes[0][0]).toEqual("00");
-			expect(cRes[0][1]).toEqual("01");
-			expect(cRes[1][0]).toEqual("20");
+		it("can return single result or error", function (done) {
+			var arc = new ArrayCollector();
+			arc.submit(0, [null]);
+			arc.submit(1, [new Error("err1")]);
+			arc.submit(2, [null, "res2"]);
+			arc.submit(3, [new Error("err3")]);
 
-			done();
+			arc.done(function (err, res) {
+				var anyErr = err.any(),
+					anyRes = res.any();
+
+				expect(anyErr.message).toEqual("err1");
+				expect(anyRes).toEqual("res2");
+
+				done();
+			});
 		});
 	});
 
-	it("can extract any result or error", function (done) {
-		var arc = new ArrayCollector();
-		arc.submit(0, [null]);
-		arc.submit(1, [new Error("err1")]);
-		arc.submit(2, [null, "res2"]);
-		arc.submit(3, [new Error("err3")]);
+	describe("when called each()", function () {
 
-		arc.done(function (err, res) {
-			var anyErr = err.any(),
-				anyRes = res.any();
+		it("can iterate over results or errors, skipping over the empty values", function (done) {
+			var arc = new ArrayCollector();
+			arc.submit(0, [null]);
+			arc.submit(1, [new Error("err1")]);
+			arc.submit(2, [null, "res2"]);
+			arc.submit(3, [new Error("err3")]);
 
-			expect(anyErr.message).toEqual("err1");
-			expect(anyRes).toEqual("res2");
+			arc.done(function (err, res) {
+				var index = 0;
+				err.each(function (e, i) {
+					if (index === 0) {
+						expect(e.message).toBe("err1");
+						expect(i).toBe(1);
+					}
+					if (index === 1) {
+						expect(e.message).toBe("err3");
+						expect(i).toBe(3);
+					}
+					expect(index).toBeLessThan(2);
+					index++;
+				});
 
-			done();
+				index = 0;
+				res.each(function (r, i) {
+					if (index === 0) {
+						expect(r).toBe("res2");
+						expect(i).toBe(2);
+					}
+					expect(index).toBeLessThan(1);
+					index++;
+				});
+
+				done();
+			});
+		});
+
+		it("can iterate over results or errors, including the empty values", function (done) {
+			var arc = new ArrayCollector();
+			arc.submit(0, [null]);
+			arc.submit(1, [new Error("err1")]);
+
+			arc.done(function (err) {
+				var index = 0;
+				err.each(true, function (e, i) {
+					if (index === 0) {
+						expect(e).toBe(null);
+						expect(i).toBe(0);
+					}
+					if (index === 1) {
+						expect(e.message).toBe("err1");
+						expect(i).toBe(1);
+					}
+					expect(index).toBeLessThan(2);
+					index++;
+				});
+				done();
+			});
+		});
+
+		it("can interrupt the iteration when callback returns false", function (done) {
+			var arc = new ArrayCollector();
+			arc.submit(0, [null, "res1"]);
+			arc.submit(1, [null, "res2"]);
+
+			arc.done(function (_, res) {
+				var index = 0;
+				res.each(true, function (r, i) {
+					expect(r).toBe("res1");
+					expect(i).toBe(0);
+					expect(index).toBeLessThan(1);
+					index++;
+					return false;
+				});
+				done();
+			});
 		});
 	});
 });

@@ -80,7 +80,9 @@ Args (the second arguments) isn't mandatory. Callback must be the last argument.
 - **switches**: Some of the options can be switched to `true` by providing 'magic' strings as arguments. All available switches are listed here and in [vars.js](lib/vars.js). You can also combine multiple switches inside one string. Eg: `"meta, first,fatal"`
 - **options**: Options hash (a last resort). The full list of options is available inside [vars.js](lib/vars.js) file.
 
-#### Count
+#### Custom types (results and errors)
+
+##### Count
 
 > `<err/res/meta>.count`
 
@@ -100,7 +102,7 @@ yaal(
 )
 ```
 
-#### Compact
+##### Compact
 
 Gets rid of the empty values in errors or results array / hash.
 
@@ -114,7 +116,7 @@ Note this also removes the information on which function led to which outcome. A
 		console.log(res.compact()); // > [["a"], ["b", "c"]]
 ```
 
-#### Flat and flatten
+##### Flat and flatten
 
 Normally, each task is expected to return a single value in its callback. These values then become members of the results (res) array or properties on the res hash.. Such array or hash is then considered "flat" and has `flat` property set to `true`.
 
@@ -170,7 +172,7 @@ If the second argument is true, we will try to find the first non-empty value if
 		console.log(res.flatten(-1)); // > [undefined, "a", "b"]
 ```
 
-#### Any
+##### Any
 
 If you just want any value from the errors or results array / hash, you can call
 
@@ -187,6 +189,33 @@ yaal(
 ```
 
 Currently, for arrays it returns the first value, but it shouldn't be relied upon.
+
+##### Each
+
+> `<err/res>.each(<all>, function (item, key/index) {}, <thisArg>)`
+
+Iterates over a results or errors object and calls the supplied function for each element.
+
+The first argument (`all`) determines whether the fn will be called for everything or only for non-empty values. Is is by default `false` and can be left out if you're only interested in hits.
+
+You can return false to end the iteration. The last argument becomes `this` within your callback, if you supply it.     
+
+```javascript
+var files = ["a.txt", "not_there1", "not_there2"];
+yaal(fs.stat, files, function (err, res) {
+	if (err) {
+		console.log(err.count); // > 2
+		err.each(function (e, index) {
+			console.log("Couldn't stat '" + files[index] + "'");
+			return false;
+		});
+		// Output: Couldn't stat 'not_there1'
+	}
+	//...
+});
+```
+
+#### Switches
 
 #### `"meta"` switch
 
@@ -311,6 +340,7 @@ Version|Date      |Description
 0.7    |2014/08/08|Added `"fatal"` switch
 0.8    |2014/08/09|Added `"first"` switch
 0.8.1  |2014/08/09|Added comma notation for switches (`"switch1, switch2"`)
+0.9    |2014/08/11|Added `<res/err>.each()` method
 
 ----
 
@@ -320,7 +350,8 @@ Ideas for future updates. Near the top: expect them soon. Near the bottom: meh.
 
 - ~~`first` switch. Stop execution and return with the first truthy value. One result is returned. Sort of useful for a "find" functionality.~~
 - ~~`fatal` switch. Any error is fatal and stops the execution. One error is returned. Like async.js.~~
-- Hash of functions with hash of arguments
+- Context for callback with a few useful methods. For example, call `this.each(fn)` to iterate over all errors and results at once
+- Multiple functions mapped to multiple arguments (so far, we have `1 -> many` and `many -> 1`)
 - `chain` switch: results from previous function used as arguments for the next one.
 - Callback commands. Instead of error, use the first argument in callback to provide all sorts of commands to the state machine. Primary use: `stop` command to end the execution immediately (but without an error)
 - `safe` switch to catch the errors and pretend they were in callback.

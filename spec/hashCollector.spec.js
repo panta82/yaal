@@ -132,64 +132,132 @@ describe("Hash collector", function () {
 		});
 	});
 
-	it("can compact errors and flat results", function (done) {
-		var hc = new HashCollector();
-		hc.submit("A", [null, "resA"]);
-		hc.submit("B", [null, "resB"]);
-		hc.submit("C", [new Error("errC")]);
+	describe("when called compact()", function () {
 
-		hc.done(function (err, res) {
-			var cErr = err.compact(),
-				cRes = res.compact();
+		it("can compact errors and flat results", function (done) {
+			var hc = new HashCollector();
+			hc.submit("A", [null, "resA"]);
+			hc.submit("B", [null, "resB"]);
+			hc.submit("C", [new Error("errC")]);
 
-			expect(cErr.count).toEqual(1);
-			expect(cErr.hasOwnProperty("A")).toBeFalsy();
-			expect(cErr.hasOwnProperty("B")).toBeFalsy();
-			expect(cErr["C"].message).toEqual("errC");
+			hc.done(function (err, res) {
+				var cErr = err.compact(),
+					cRes = res.compact();
 
-			expect(cRes.count).toEqual(2);
-			expect(cRes["A"]).toEqual("resA");
-			expect(cRes["B"]).toEqual("resB");
-			expect(cRes.hasOwnProperty("C")).toBeFalsy();
+				expect(cErr.count).toEqual(1);
+				expect(cErr.hasOwnProperty("A")).toBeFalsy();
+				expect(cErr.hasOwnProperty("B")).toBeFalsy();
+				expect(cErr["C"].message).toEqual("errC");
 
-			done();
+				expect(cRes.count).toEqual(2);
+				expect(cRes["A"]).toEqual("resA");
+				expect(cRes["B"]).toEqual("resB");
+				expect(cRes.hasOwnProperty("C")).toBeFalsy();
+
+				done();
+			});
+		});
+
+		it("can compact nested results", function (done) {
+			var hc = new HashCollector();
+			hc.submit("A", [null, "A1", "A2"]);
+			hc.submit("B", [null]);
+			hc.submit("C", [null, "C1"]);
+
+			hc.done(function (err, res) {
+				var cRes = res.compact();
+
+				expect(cRes.count).toEqual(2);
+				expect(cRes["A"][0]).toEqual("A1");
+				expect(cRes["A"][1]).toEqual("A2");
+				expect(cRes.hasOwnProperty("B")).toBeFalsy();
+				expect(cRes["C"][0]).toEqual("C1");
+
+				done();
+			});
 		});
 	});
 
-	it("can compact nested results", function (done) {
-		var hc = new HashCollector();
-		hc.submit("A", [null, "A1", "A2"]);
-		hc.submit("B", [null]);
-		hc.submit("C", [null, "C1"]);
+	describe("when called any()", function () {
 
-		hc.done(function (err, res) {
-			var cRes = res.compact();
+		it("an return single result or error", function (done) {
+			var hc = new HashCollector();
+			hc.submit("A", [null]);
+			hc.submit("B", [new Error("errB")]);
+			hc.submit("C", [null, "resC"]);
+			hc.submit("D", [new Error("errD")]);
 
-			expect(cRes.count).toEqual(2);
-			expect(cRes["A"][0]).toEqual("A1");
-			expect(cRes["A"][1]).toEqual("A2");
-			expect(cRes.hasOwnProperty("B")).toBeFalsy();
-			expect(cRes["C"][0]).toEqual("C1");
+			hc.done(function (err, res) {
+				var anyErr = err.any(),
+					anyRes = res.any();
 
-			done();
+				expect(anyErr.message).toEqual("errB");
+				expect(anyRes).toEqual("resC");
+
+				done();
+			});
 		});
 	});
 
-	it("can extract any result or error", function (done) {
-		var hc = new HashCollector();
-		hc.submit("A", [null]);
-		hc.submit("B", [new Error("errB")]);
-		hc.submit("C", [null, "resC"]);
-		hc.submit("D", [new Error("errD")]);
+	describe("when called each()", function () {
 
-		hc.done(function (err, res) {
-			var anyErr = err.any(),
-				anyRes = res.any();
+		it("can iterate over results or errors, skipping over the empty values", function (done) {
+			var hc = new HashCollector();
+			hc.submit("A", [null]);
+			hc.submit("B", [new Error("errB")]);
+			hc.submit("C", [null, "resC"]);
+			hc.submit("D", [new Error("errD")]);
 
-			expect(anyErr.message).toEqual("errB");
-			expect(anyRes).toEqual("resC");
+			hc.done(function (err, res) {
+				var index = 0;
+				err.each(function (e, i) {
+					if (index === 0) {
+						expect(e.message).toBe("errB");
+						expect(i).toBe("B");
+					}
+					if (index === 1) {
+						expect(e.message).toBe("errD");
+						expect(i).toBe("D");
+					}
+					expect(index).toBeLessThan(2);
+					index++;
+				});
 
-			done();
+				index = 0;
+				res.each(function (r, i) {
+					if (index === 0) {
+						expect(r).toBe("resC");
+						expect(i).toBe("C");
+					}
+					expect(index).toBeLessThan(1);
+					index++;
+				});
+
+				done();
+			});
+		});
+
+		it("can iterate over results or errors, including the empty values", function (done) {
+			var arc = new HashCollector();
+			arc.submit("A", [null]);
+			arc.submit("B", [new Error("errB")]);
+
+			arc.done(function (err) {
+				var index = 0;
+				err.each(true, function (e, i) {
+					if (index === 0) {
+						expect(e).toBe(null);
+						expect(i).toBe("A");
+					}
+					if (index === 1) {
+						expect(e.message).toBe("errB");
+						expect(i).toBe("B");
+					}
+					expect(index).toBeLessThan(2);
+					index++;
+				});
+				done();
+			});
 		});
 	});
 });
