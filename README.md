@@ -350,8 +350,10 @@ Ideas for future updates. Near the top: expect them soon. Near the bottom: meh.
 
 - ~~`first` switch. Stop execution and return with the first truthy value. One result is returned. Sort of useful for a "find" functionality.~~
 - ~~`fatal` switch. Any error is fatal and stops the execution. One error is returned. Like async.js.~~
-- Context for callback with a few useful methods. For example, call `this.each(fn)` to iterate over all errors and results at once
-- Multiple functions mapped to multiple arguments (so far, we have `1 -> many` and `many -> 1`)
+- Single task applied on each key/value of a hash, producing hash of results.
+- Single task applied to an array of arguments, but producing a hash of results, with picked element of each argument serving as key.
+- Context for callback with a few useful methods. For example, call `this.each(fn)` to iterate over all errors and results at once.
+- Multiple functions mapped to multiple arguments (so far, we have `1 -> many` and `many -> 1`).
 - `chain` switch: results from previous function used as arguments for the next one.
 - Callback commands. Instead of error, use the first argument in callback to provide all sorts of commands to the state machine. Primary use: `stop` command to end the execution immediately (but without an error)
 - `safe` switch to catch the errors and pretend they were in callback.
