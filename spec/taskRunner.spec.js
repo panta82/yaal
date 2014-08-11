@@ -154,7 +154,7 @@ describe("Task runner", function () {
 		}
 	});
 
-	it("can emit an 'end' event", function (done) {
+	it("can emit an 'end' event for positive count", function (done) {
 		var tr = new TaskRunner(3, 2);
 
 		var readyCount = 0;
@@ -185,6 +185,27 @@ describe("Task runner", function () {
 			expect(tr.ended).toEqual(true);
 			done();
 		});
+	});
+
+	it("can emit an 'end' event for zero count", function (done) {
+		var tr = new TaskRunner(3, 0);
+
+		expect(tr.total).toEqual(0);
+		expect(tr.ended).toEqual(false);
+
+		var emitted = false;
+
+		tr.on("ready", function () {
+			expect(false).toBe(true);
+		});
+		tr.on("end", function () {
+			emitted = true;
+		});
+
+		setTimeout(function () {
+			expect(emitted).toBe(true);
+			done();
+		}, 50);
 	});
 
 	it("will refuse to add additional functions if at capacity", function (done) {

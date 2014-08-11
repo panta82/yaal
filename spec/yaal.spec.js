@@ -22,6 +22,15 @@ describe("Yaal", function () {
 				done();
 			});
 		});
+
+		it("should work with an empty list", function (done) {
+			yaal([], function (err, res) {
+				expect(err).toEqual(null);
+				expect(res.count).toEqual(0);
+				expect(res.length).toEqual(0);
+				done();
+			});
+		});
 	});
 
 	describe("when provided a hash of tasks", function () {
@@ -42,6 +51,14 @@ describe("Yaal", function () {
 				expect(res.A).toEqual("resA");
 				expect(res.B).toEqual("resB");
 				expect(new Date() - startedAt).toBeLessThan(220);
+				done();
+			});
+		});
+
+		it("should work with an empty hash", function (done) {
+			yaal({}, function (err, res) {
+				expect(err).toEqual(null);
+				expect(res.count).toEqual(0);
 				done();
 			});
 		});
@@ -70,6 +87,15 @@ describe("Yaal", function () {
 				expect(res[0][1]).toEqual(-2);
 				expect(res[1][0]).toEqual(-4);
 				expect(res[1][1]).toEqual(8);
+				done();
+			});
+		});
+
+		it("should work with an empty list of arguments", function (done) {
+			yaal(libHelpers.asyncToUppercase, [], function (err, res) {
+				expect(err).toEqual(null);
+				expect(res.length).toEqual(0);
+				expect(res.count).toEqual(0);
 				done();
 			});
 		});
@@ -225,6 +251,15 @@ describe("Yaal", function () {
 			yaal(fns, 1, yaal.FIRST, function (err, res) {
 				expect(res).toBe("res1");
 
+				done();
+			});
+		});
+
+		it("will return not found value even if given an empty input data", function (done) {
+			yaal(yaal, [[[], "first"], [{}, "first"]], function (err, res) {
+				expect(err).toBe(null);
+				expect(res[0]).toBe(null);
+				expect(res[1]).toBe(null);
 				done();
 			});
 		});

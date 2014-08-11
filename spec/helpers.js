@@ -38,7 +38,7 @@ exports.asyncAddSub = function asyncAddSub(a, b, callback) {
 };
 
 exports.expectTimestamp = function expectTimestamp(expect, ts, target, precision) {
-	precision = precision || 20;
+	precision = precision || 35;
 	ts = ts.getTime ? ts.getTime() : ts;
 	target = target.getTime ? target.getTime() : target;
 	expect(ts).toBeGreaterThan(target - precision);
