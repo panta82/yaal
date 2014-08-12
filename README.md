@@ -345,7 +345,7 @@ Version|Date      |Description
 0.8    |2014/08/09|Added `"first"` switch
 0.8.1  |2014/08/09|Added comma notation for switches (`"switch1, switch2"`)
 0.9    |2014/08/11|Added `<res/err>.each()` method
-0.9.1  |2014/08/12|Added `emptyErrorsToNull` option
+0.9.2  |2014/08/12|Added `emptyErrorsToNull` option
 
 ----
 
