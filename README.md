@@ -2,7 +2,7 @@
 
 ----
 
-Or, Yet Another Async Library <small>(clever, huh?)</small>. Execute any number of tasks, with any number of arguments, in parallel or series. Receive all the results, and then easily parse them to get the data you need. The one async function to rule them all.
+Yet Another Async Library. Execute any number of tasks, with any number of arguments, in parallel or series. Receive all the results, and then easily manipulate them to get the data you need. The one async function to rule them all (or at least that's the goal).
 
 Install with:
 
@@ -10,11 +10,13 @@ Install with:
 npm install yaal
 ```
 
-Then use with:
+Then use like this:
 
 ```javascript
+    // You only need this one function.
+	var yaal = require("yaal");
+
 	// Stat a group of files, one at the time
-    var yaal = require("yaal");
     yaal(fs.stat, ["file1.txt", "file2.txt", "missing"], 1, function (err, res) {
     	if (err) {
         	console.log("One of the raised errors: " + err.any());
@@ -47,14 +49,16 @@ Thus, ***yaal*** was born.
 ### Features
 
  - Simple installation and usage (single function)
- - Callback mechanism, similar to async.js
+ - Callback / closure syntax, following node.js standards (no huge refactoring required)
  - Three execution modes:
   - Array of tasks, receive array of results
   - Hash of tasks, receive hash of results
   - Single task, executed on array of arguments, receive array of results
- - Powerful result and error handling
+ - All raised errors returned, but they are still easy to handle thanks to custom return types
  - Execute in series, in parallel or with custom number of parallel tasks at once
- - Provides metadata about timings of each task (useful in profiling)
+ - Can provide metadata on timings of each task (useful for profiling)
+ - Can stop on the first error (acting like most other async libs)
+ - Can stop on the first result 
  - Full test suite and [documentation](#documentation)
  - No dependencies
  
@@ -215,7 +219,7 @@ yaal(fs.stat, files, function (err, res) {
 });
 ```
 
-#### Switches
+#### Options
 
 #### `"meta"` switch
 
@@ -254,7 +258,7 @@ yaal(processors, item, "first", function (err, res) {
 	}
 });
 ```
-For details about the options, consult the [vars.js](lib/vars.js) file.
+For more details about the options, consult the [vars.js](lib/vars.js) file.
 
 ----
 
@@ -341,6 +345,7 @@ Version|Date      |Description
 0.8    |2014/08/09|Added `"first"` switch
 0.8.1  |2014/08/09|Added comma notation for switches (`"switch1, switch2"`)
 0.9    |2014/08/11|Added `<res/err>.each()` method
+0.9.1  |2014/08/12|Added `emptyErrorsToNull` option
 
 ----
 
