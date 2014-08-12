@@ -141,6 +141,23 @@ describe("Yaal", function () {
 		});
 	});
 
+	it("should accept non-default emptyErrorsToNull option", function (done) {
+		var fns = [libHelpers.makeTimeoutFn(1, null, "a"), libHelpers.makeTimeoutFn(1, null, "b")];
+		yaal(fns, { emptyErrorsToNull: false }, function (err) {
+			expect(err).not.toBe(null);
+			expect(err.length).toBe(2);
+			expect(err.count).toBe(0);
+			expect(err[0]).toBe(null);
+			expect(err[1]).toBe(null);
+			expect(err.compact().length).toBe(0);
+			expect(err.any()).toBe(null);
+			err.each(function () {
+				expect(true).toBe(false);
+			});
+			done();
+		});
+	});
+
 	describe("when supplied the 'meta' switch", function () {
 
 		it("should collect metadata in an array", function (done) {
