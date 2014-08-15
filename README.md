@@ -362,7 +362,7 @@ Ideas for future updates. Near the top: expect them soon. Near the bottom: meh.
 - `chain` switch: results from previous function used as arguments for the next one.
 - `safe` switch to catch the errors and pretend they were in callback.
 - Callback commands. Instead of error, use the first argument in callback to provide all sorts of commands to the state machine. Primary use: `stop` command to end the execution immediately (but without an error)
-- Allow adding more tasks after the initial yaal call (by returning some kind of job" object)
+- Allow adding more tasks after the initial yaal call (by returning some kind of "job" object)
 - `repeat` switch. Repeat operation until error or `stop`.
 
 Your own ideas, feedback, bug reports or PRs welcome.
