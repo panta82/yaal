@@ -77,7 +77,7 @@ if (false) (function () {
 	});
 })();
 
-if (true) (function () {
+if (false) (function () {
 	var hc = new HashCollector();
 	hc.submit("A", [null, "resA"]);
 	hc.submit("B", [null, "resB"]);
@@ -105,3 +105,15 @@ if (true) (function () {
 	});
 })();
 
+if (true) (function () {
+	var hc = new HashCollector();
+	hc.submit("A", [null, "A1"]);
+	hc.submit("B", [null]);
+	hc.submit("C", [null, "C1", "C2", "C3"]);
+	hc.submit("D", [null, "D1", "D2"]);
+	hc.done(function (err, res) {
+		console.log(err, res);
+		var flat = res.flatten();
+		console.log(flat);
+	});
+})();

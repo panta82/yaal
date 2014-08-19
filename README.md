@@ -154,17 +154,26 @@ Without any arguments, all elements are preserved. In case of an array, the valu
         console.log(res2); // > ["a", "b", "c"]
 ```
 
-In case of hashes, they are moved under new properties that follow the naming convention "`<oldname>_<index> = <value>`". In case where there is just one value, the old name is preserved. 
+In case of hashes, duplicate properties are renamed to pattern "`<oldname>_<index> = <value>`" (by default, can be changed). 
 
 ```javascript
-console.log(hash); // {x: ["a", "b"], y: ["c"], "z": []}
-var hash2 = hash.flatten();
-console.log(hash2); // {x_0: "a", x_1: "b", y: "c"}
+yaal({
+		x: function (cb) { cb(null, "a", "b"); },
+		y: function (cb) { cb(null, "c"); },
+		z: function (cb) { cb(null); }
+	},
+    function (err, hash) {
+    	console.log(hash); // {x: ["a", "b"], y: ["c"], "z": []}
+    	var hash2 = hash.flatten();
+    	console.log(hash2); // {x: "a", x_1: "b", y: "c", z: undefined}
+    });
+)
 ```
 
 If you call flatten with an index, it will extract only a single value for each result and throw away the rest.
 
 ```javascript
+		console.log(res); // > [[], ["a"], ["b", "c"]]
 		console.log(res.flatten(1)); // > [undefined, undefined, "c"]
 ```
 
@@ -173,7 +182,9 @@ Notice that, in this case, the `undefined` from the first callback was left inta
 If the second argument is true, we will try to find the first non-empty value if the index overflows (like it did in the previous example).
 
 ```javascript
-		console.log(res.flatten(-1)); // > [undefined, "a", "b"]
+		console.log(res); // > [[], ["a"], ["b", "c"], ["d", "e", "f"]]
+		console.log(res.flatten(-1)); // > [undefined, "a", "c", "f"]
+		console.log(res.flatten(-3)); // > [undefined, "a", "b", "d"]
 ```
 
 ##### Any
@@ -346,6 +357,15 @@ Version|Date      |Description
 0.8.1  |2014/08/09|Added comma notation for switches (`"switch1, switch2"`)
 0.9    |2014/08/11|Added `<res/err>.each()` method
 0.9.2  |2014/08/12|Added `emptyErrorsToNull` option
+0.9.3  |2014/08/18|Added `hashDuplicateKeyFormat` option
+
+----
+
+### Breaking changes
+
+Version|Date      |Description
+-------|----------|-----------
+0.9.3  |2014/08/18|Changed the way duplicate hash keys are numbered. Used to be: `["key_0", "key_1", "key_2"]`. Now: `["key", "key_1", "key_2"]`.
 
 ----
 

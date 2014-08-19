@@ -78,10 +78,10 @@ describe("Hash collector", function () {
 				expect(hash["A"]).toEqual("A1");
 				expect(hash["B"]).toEqual(undefined);
 				expect(hash.hasOwnProperty("B")).toBeTruthy();
-				expect(hash["C_0"]).toEqual("C1");
+				expect(hash["C"]).toEqual("C1");
 				expect(hash["C_1"]).toEqual("C2");
 				expect(hash["C_2"]).toEqual("C3");
-				expect(hash["D_0"]).toEqual("D1");
+				expect(hash["D"]).toEqual("D1");
 				expect(hash["D_1"]).toEqual("D2");
 			});
 		});

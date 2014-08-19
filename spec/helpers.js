@@ -20,7 +20,7 @@ exports.makeTimeoutFn = function makeTimeoutFn(ms) {
 exports.asyncToUppercase = function asyncToUppercase(str, callback) {
 	setTimeout(function () {
 		if (str) {
-			callback(null, str.toUpperCase());
+			callback(null, String(str).toUpperCase());
 		} else {
 			callback(new Error("Invalid"));
 		}
