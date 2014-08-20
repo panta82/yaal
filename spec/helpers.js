@@ -17,6 +17,12 @@ exports.makeTimeoutFn = function makeTimeoutFn(ms) {
 	}
 };
 
+exports.asyncMirror = function asyncMirror(x, callback) {
+	setTimeout(function () {
+		callback(null, String(x));
+	}, 100);
+};
+
 exports.asyncToUppercase = function asyncToUppercase(str, callback) {
 	setTimeout(function () {
 		if (str) {
