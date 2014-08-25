@@ -79,8 +79,16 @@ if (false) (function () {
 	});
 })();
 
-if (true) (function () {
+if (false) (function () {
 	yaal(libHelpers.asyncMirror, [[1, "a"], [2, "b", "c"], [3]], "hash", { hashIndex: 1 }, function (_, results) {
 		console.log(results);
+		console.log(Object.keys(results));
+	});
+})();
+
+if (true) (function () {
+	yaal(libHelpers.asyncMirror, [["a"], ["b"], [3]], "hash5", function (_, results) {
+		console.log(results);
+		console.log(Object.keys(results));
 	});
 })();

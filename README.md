@@ -58,7 +58,8 @@ Thus, ***yaal*** was born.
  - Execute in series, in parallel or with custom number of parallel tasks at once
  - Can provide metadata on timings of each task (useful for profiling)
  - Can stop on the first error (acting like most other async libs)
- - Can stop on the first result 
+ - Can stop on the first result
+ - Can generate hash from input arrays, with customizable key lookup 
  - Full test suite and [documentation](#documentation)
  - No dependencies
  
@@ -269,7 +270,42 @@ yaal(processors, item, "first", function (err, res) {
 	}
 });
 ```
-For more details about the options, consult the [vars.js](lib/vars.js) file.
+
+#### `"hash"` switch
+
+A way to produce a hash-based result from an array-of-tasks or single-task input.
+
+In the former case, hash keys are extracted from task function names. In case of anonymous functions, keys are stringified indexes from the input array (can be customized in [vars.js](lib/vars.js))
+
+```javascript
+var fns = [
+	function getData() { /*...*/ },
+	function () { /*...*/ }
+];
+yaal(processors, item, "hash", function (err, res) {
+	console.log(Object.keys(res)); // > ['getData', '1']
+});
+```
+
+If used in a single-task scenario, the keys for the resulting hash will by default be extracted from the first element of each submitted argument.  
+
+```javascript
+yaal(toUpperCase, ["a", "b"], "hash", function (err, res) {
+	console.log(res.a) // > "A"
+	console.log(res.b) // > "B"
+});
+```
+
+Hash switch allows an additional form: `hash$num`, where `$num` is the specific index from which to extract hash key. Negative values are indexed from right. This is only applicable in cases with nested argument arrays.
+
+```javascript
+yaal(upload, [[file, "site1.com"], [file, "site2.com"]], "hash1", function (err, res) {
+	console.log(res["site1.com"]) // > "Ok"
+	console.log(err["site2.com"]) // > "[Error: Connection timeout]"
+});
+```
+
+#####For more details about the options, consult the [vars.js](lib/vars.js) file.
 
 ----
 
@@ -343,7 +379,7 @@ Query multiple databases (with multiple arguments each). Compare the response ti
     });
 ```
 
-Want more? Check out the [documentation](#documentation) examples and `spec/` folder.
+For advanced usage examples (with switches and more), check out the [documentation](#documentation) examples and the `spec/` folder.
 
 ----
 
@@ -358,6 +394,7 @@ Version|Date      |Description
 0.9    |2014/08/11|Added `<res/err>.each()` method
 0.9.2  |2014/08/12|Added `emptyErrorsToNull` option
 0.9.3  |2014/08/18|Added `hashDuplicateKeyFormat` option
+0.10.0 |2014/08/25|Added `hash` switch
 
 ----
 
@@ -375,8 +412,9 @@ Ideas for future updates. Near the top: expect them soon. Near the bottom: meh.
 
 - ~~`first` switch. Stop execution and return with the first truthy value. One result is returned. Sort of useful for a "find" functionality.~~
 - ~~`fatal` switch. Any error is fatal and stops the execution. One error is returned. Like async.js.~~
+- ~~Single task applied to an array of arguments, but producing a hash of results, with picked element of each argument serving as key.~~
+-  Is it possible to add some kind of fixed arguments in a single-task scenario, that will be supplied for each call?
 - Single task applied on each key/value of a hash, producing hash of results.
-- Single task applied to an array of arguments, but producing a hash of results, with picked element of each argument serving as key.
 - Context for callback with a few useful methods. For example, call `this.each(fn)` to iterate over all errors and results at once.
 - Multiple functions mapped to multiple arguments (so far, we have `1 -> many` and `many -> 1`).
 - `chain` switch: results from previous function used as arguments for the next one.
