@@ -17,7 +17,9 @@ exports.makeTimeoutFn = function makeTimeoutFn(ms) {
 	}
 };
 
-exports.asyncMirror = function asyncMirror(x, callback) {
+exports.asyncMirror = function asyncMirror() {
+	var x = arguments[0],
+		callback = arguments[arguments.length - 1];
 	setTimeout(function () {
 		callback(null, String(x));
 	}, 100);

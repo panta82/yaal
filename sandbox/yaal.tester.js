@@ -19,7 +19,7 @@ if (false) (function () {
 	});
 })();
 
-if (true) (function () {
+if (false) (function () {
 	var fns = [
 		function (x, y, cb) {
 			cb(null, (x + 10) / y);
@@ -76,5 +76,11 @@ if (false) (function () {
 
 	yaal(fns, 1, "meta, first", function (err, res, meta) {
 		console.log(err, res, meta);
+	});
+})();
+
+if (true) (function () {
+	yaal(libHelpers.asyncMirror, [[1, "a"], [2, "b", "c"], [3]], "hash", { hashIndex: 1 }, function (_, results) {
+		console.log(results);
 	});
 })();
