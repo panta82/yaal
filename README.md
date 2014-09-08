@@ -282,7 +282,7 @@ var fns = [
 	function getData() { /*...*/ },
 	function () { /*...*/ }
 ];
-yaal(processors, item, "hash", function (err, res) {
+yaal(fns, "hash", function (err, res) {
 	console.log(Object.keys(res)); // > ['getData', '1']
 });
 ```
