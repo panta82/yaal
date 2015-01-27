@@ -86,9 +86,33 @@ if (false) (function () {
 	});
 })();
 
-if (true) (function () {
+if (false) (function () {
 	yaal(libHelpers.asyncMirror, [["a"], ["b"], [3]], "hash5", function (_, results) {
 		console.log(results);
 		console.log(Object.keys(results));
+	});
+})();
+
+if (true) (function () {
+	var lte5 = function (x, cb) {
+		if (x > 5) {
+			return cb(new Error("Not good"));
+		}
+		return cb(null);
+	};
+	var data = [1, 2, 3, 8, 1, -5, 6, 5, 9, 10];
+	yaal(lte5, data, function (err, results) {
+		if (err) {
+			return callback(new Error("Input " + data[err.index()] + " error: " + err.any()));
+		}
+		if (err) {
+			err.any(function (err, index) {
+				callback(new Error("Input " + data[index] + " error: " + err));
+			});
+		}
+
+		console.log(err, results);
+		console.log(err.index);
+		console.log(err.indexes);
 	});
 })();
